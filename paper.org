@@ -1,0 +1,1486 @@
+:PROPERTIES:
+:ID: 0279ae6b-5eb9-4156-94ca-bf9262071696
+:END:
+#+title: Unpacking Complexity: Human Preference Guides Interpretable Combinatorial Solutions
+#+project: JOptim paper
+#+created: [2023-10-30 Mon]
+#+last_modified: [2023-10-30 Mon 22:24]
+#+PUBLISH_DIR:2025_joptim
+#+LATEX_HEADER:\authorsnames[1, 2, 1, 1, 1]{Dominik Pegler, Frank Jäkel, David Steyrl, Frank Scharnowski, Filip Melinscak}
+#+LATEX_HEADER:\authorsaffiliations{{Department of Cognition, Emotion, and Methods in Psychology, Faculty of Psychology, University of Vienna}, {Centre for Cognitive Science \& Institute of Psychology, TU Darmstadt}}
+#+LaTeX_HEADER:\shorttitle{Interpretable Combinatorial Solutions}
+#+LaTeX_HEADER:\authornote{
+#+LaTeX_HEADER:Corresponding author: Dominik Pegler. E-mail: \texttt{dominik.pegler@univie.ac.at}}
+#+setupfile: setupfile_apa7.org
+#+LaTeX_HEADER: \usepackage{caption}
+# needed for inline values
+#+BIND: org-babel-inline-result-wrap "%s"
+#+BIND: org-export-babel-evaluate t
+#+PROPERTY: header-args:emacs-lisp :results value raw :exports results
+
+# old title: Human Interpretability of Machine Solutions to Combinatorial Packing Problems
+# possible titles Unpacking Complexity: Human Preferences for Machine-Generated Solutions/
+# Human Preference Reveals Structural Principles for Interpretable Optimization
+# to publish as preprint run my/org-preprint-export and find it in the ~/Dropbox/preprints folder
+
+#+LATEX_HEADER:\abstract{Automated planners often return optimal solutions that are hard to understand, making interpretability a prerequisite for effective human–algorithm collaboration. In combinatorial packing, where many solutions can be equally optimal, a feature-based account of what makes one solution clearer than another is still lacking. Here we ask which structural properties of optimal packing solutions drive human interpretability. We present a psychophysical paradigm using a multiple subset sum variant of bin packing in which participants chose which of two equally optimal solutions was easier to understand. We show that preferences reliably track three quantifiable properties of solution structure: alignment with a greedy heuristic, simpler within-bin composition, and ordered visual representation. The strongest and most reproducible associations were observed for simple compositions and ordered representations, with heuristic alignment also showing a consistent association. Reaction-time evidence was mixed, with faster responses observed primarily when heuristic differences were larger, and aggregate webcam-based gaze showed no reliable complexity effects. These results provide a concrete, feature-based account of interpretability in optimal packing solutions, linking stimulus structure to human preference. By identifying actionable properties --- simple compositions, ordered representation, and heuristic alignment --- our findings support "interpretability-aware" optimization and presentation of machine solutions, and outline a path to quantify trade-offs between optimality and interpretability in real-world allocation and design tasks.}
+#+LATEX_HEADER:\keywords{Multiple Subset Sum, Human-Machine Collaboration, Problem Solving, Interpretability}
+
+* TODOs :noexport:
+
+
+** TODO create figures (merge problem + complexity metrics + experiment into 1 figure?)
+
+** TODO mention exclusion of 1 participant with <= 992 viewport width
+- indicates mobile device \to noisier results to be expected, not everything working smoothly (escpecially eye tracking)
+- this is visible in the eye download file. Move it out of it. If none were excluded, also mention it in the methods (sample).
+- mention that this was done after having loaded the data and prolific data, prior to data processing
+** TODO exclude poor precision from eye tracking (possible?how?)
+** TODO Simple way to check assumptions is to plot residuals and plot random effects
+- assumptions for linear mixed effects models: residual errors and random effects deviations  are normally distributed 
+
+Best practice:
+
+#+begin_example
+Report what data cleaning has been completed, outlier/data  removal, transformations (e.g., centering or standardizing  variables) or other changes prior to or following analysis  (e.g., Baayen & Milin, 2015).  Report whether models meet assumptions for LMMs.  Report if transformations were carried out in order to meet  assumptions (e.g., log transformation of reaction time to  meet the assumption that residuals are normally distributed)
+#+end_example
+
+** TODO justify the choice of AIC
+
+** TODO report complete model comparisons in appendix
+
+- also with info about convergence issues
+- 
+
+** TODO Figure with example pair per metric: show other metrics
+
+- might be good to also show the z-scores of the other metrics. Although we cant make causal claims, for interpretation we could see how well the other metrics could also explain the choice probabilities. E.g., one example shows -1.8 for CC, but it might also have -2.7 for heuristic. Then it would be good example for the combination of both and not for only CC.
+
+** TODO final check: check if methods align with code
+
+* Introduction
+
+Advances in algorithmic optimization and machine learning increasingly place automated solvers at the center of human–machine collaboration. In many real deployments, when these solvers produce plans or assignments, human interpretability becomes a practical prerequisite for adoption and safe use. We focus on packing-class problems, where multiple distinct solutions can be equally optimal yet differ markedly in how understandable they feel to people. Our question is simple: when optimal solutions are tied on value, which structural properties make one solution easier to understand than another?
+
+** Combinatorial Packing and the Multiple Subset Sum Problem (MSSP)
+
+Packing problems --- such as the classical bin packing problem [cite/p:@johnsonWorstcasePerformanceBounds1974] and multi-knapsack [cite/p:@cacchianiKnapsackProblemsOverview2022] --- require assigning items of varying sizes to capacity-limited bins under hard constraints. We study the multiple subset sum problem (MSSP; [cite//bare:@capraraMultipleSubsetSum2000]), a special case of multi-knapsack in which each item's profit equals its size, the number and capacity of bins are fixed, and the objective is to maximize total packed size. This class is foundational in operations research and has high-impact applications in resource allocation and logistics [cite/p:@gunawanTrendsMultidisciplinaryScheduling2021]. For example, hospitals must assign patients (items with care requirements) to a limited number of intensive-care beds (bins with capacities) [cite/p:@marzoukNursePatientAssignment2021]. Capital budgeting similarly requires allocating limited resources across competing projects [cite/p:@gurskiKnapsackProblemsParameterized2019]. Multiple solutions can achieve equal objective value; yet, some are easier to reason about, communicate, or modify, making them more useful in practice.
+
+Figure ref:fig:problem illustrates an instance of the MSSP used in this study, visually represented as an assignment matrix. In this representation, rows correspond to individual items, and columns to bins. Item assignments are marked by gray dots in cells, and item sizes are conveyed by block lengths and numerical labels. The overall objective score, or total packed size, is prominently displayed in the upper-right corner.
+
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[height=.35\textheight]{~/Dropbox/data_export/joptim-analysis/pub/fig_problem.pdf}
+  \caption{\label{fig:problem}Illustration of the Multiple Subset Sum Problem}
+\par\footnotesize\textit{Note}. An instance of the Multiple Subset Sum Problem (MSSP). Rows denote items, and columns denote bins. Item assignments are indicated by gray dots in cells. Item sizes are represented by block lengths and numerical labels. The overall objective score (total packed size) is shown in the upper-right corner.\end{figure}
+#+end_export
+
+** Interpreting Optimal Solutions
+
+Even when clearly presented, optimal solutions to combinatorial problems like the MSSP can vary substantially in how readily humans can grasp their underlying structure and rationale. Following established usage, we refer to this human-centered quality as interpretability: the degree to which users can understand and effectively work with a machine-generated solution (the plan or allocation), distinct from the parameters of a predictive model [cite/p:@doshi-velezRigorousScienceInterpretable2017]. Psychologically, interpretability interacts with perception, understanding, and trust: people favor solutions that align with familiar structures and that they can mentally simulate or justify, even at the cost of forgoing opaque but optimal alternatives [cite/p:@kahnemanThinkingFastSlow2011; @millerExplanationArtificialIntelligence2019; @liptonMythosModelInterpretability2017; @tverskyJudgmentUncertaintyHeuristics1974; @dietvorstAlgorithmAversionPeople2015; @swellerCognitiveLoadProblem1988; @zerilliHowTransparencyModulates2022; @bussoneRoleExplanationsTrust2015; @leeTrustAutomationDesigning2004]. While a substantial portion of research in explainable artificial intelligence (XAI) has focused on explanations for predictions [cite/p:@barredoarrietaExplainableArtificialIntelligence2020; @abdulTrendsTrajectoriesExplainable2018; @rudinStopExplainingBlack2019], far less is known about what makes one optimal plan more intelligible than another in combinatorial settings. Crucially, research on explanation interpretability has shown that increasing the complexity of explanations (e.g., through more terms or new concepts) can increase the time required for humans to verify their consistency [cite/p:@narayananHowHumansUnderstand2018].
+
+** Complexity-Informed Proxies for Interpretability
+
+We argue that interpretability depends on three solution-level properties that align with well-established cognitive and perceptual principles. First, humans often rely on simple heuristics to solve  problems, preferring structures that match familiar construction rules and finding large deviations harder to rationalize [cite/p:@gigerenzerHeuristicDecisionMaking2011; @tverskyJudgmentUncertaintyHeuristics1974; @cormenIntroductionAlgorithms2009]. Second, compositional simplicity reduces cognitive load: bins that are nearly empty or nearly full and contain few items are easier to encode and compare than bins with many items, uneven splits, or mid-fill [cite/p:@swellerCognitiveLoadProblem1988; @tverskyAnimationCanIt2002]. Third, perceptual organization favors ordered layouts; sequences that can be summarized by short rules (e.g., "largest first") are preferred under simplicity/likelihood principles [cite/p:@feldmanSimplicityPrinciplePerception2016; @vanderhelmSimplicityLikelihoodVisual2000].
+
+As shown in Figure ref:fig:complexity, we operationalize these ideas with three solution-level metrics, introduced here at a high level and defined in detail in [[#methods][Methods]]. /Heuristic-related complexity/ (HC) quantifies deviation from a canonical greedy packing heuristic, providing a measure of how closely a solution follows an intuitive construction. /Compositional complexity/ (CC) quantifies how challenging a bin's contents are to grasp at a glance, increasing when a bin holds many items, features less balanced item sizes, or is only partially filled (neither nearly empty nor nearly full). /Visual-order complexity/ (VC) indexes the disorder of the display order of bins and items, reflecting the degree to which a solution deviates from a sorted, rule-like presentation. As a visual-layout control, we include diagonal dissimilarity (DD), a covariate that captures purely geometric similarity to an idealized diagonal-like assignment pattern.
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=1.0\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/fig_metrics.pdf}
+  \caption{\label{fig:complexity}Three Metrics for Describing Complexity of Solutions}
+\par\footnotesize\textit{Note}. The three panels describe our intuition behind the three hypothesized complexity metrics. Each focuses on a different aspect of the solution, as highlighted by the red annotations. Panel {\bfseries{a}}: Heuristic-related complexity (HC) focuses on the assignments and how much they deviate from the greedy heuristic. Panel {\bfseries{b}}: Compositional complexity (CC) focuses on the bins and how clean/organized/filled (see definition) they are. Panel {\bfseries{c}}: Visual-order complexity (VC) focuses on whether the elements of the solution are sorted by size or follow a chaotic order.\end{figure}
+#+end_export
+
+** Prior Work and Gap
+
+Explainable planning emphasizes aligning plans with users' mental models --- through model reconciliation, contrastive rationales, or plan annotations --- highlighting that intelligibility depends on both derivation and presentation [cite/p:@foxExplainablePlanning2017; @chakrabortiPlanExplanationsModel2017]. In bin packing and knapsack research, structural regularities and greedy heuristics are well-characterized [cite/p:@coffmanApproximationAlgorithmsBin1997; @kellererKnapsackProblems2004]. Behavioral work shows that humans rely on simple strategies and that performance depends on instance structure [cite/p:@macgregorHumanPerformanceTraveling2011; @dumnicPathGameCrowdsourcingTimeconstrained2019; @murawskiHowHumansSolve2016; @francoGenericPropertiesComputational2021; @francoTaskindependentMetricsComputational2022]. Even when asked to discriminate between solutions of varying optimality, humans may struggle to consistently identify the truly optimal option, suggesting inherent difficulties in evaluating complex combinatorial outputs [cite/p:@kyritsisPerceivedOptimalityCompeting2022]. While explainable planning offers methods for justifying and aligning plans with users' mental models, and work on predictive explanations has advanced substantially in the field of explainable artificial intelligence (XAI; [cite//bare:@barredoarrietaExplainableArtificialIntelligence2020; @rudinStopExplainingBlack2019]), empirical and feature-based accounts of interpretability for combinatorial optimization solutions are still emerging [cite/p:@ibsHumanExplanationsExplainable2024]. We still lack an empirical, feature-based account that predicts perceived interpretability among equally optimal packing solutions; related studies on competing solutions in other combinatorial domains likewise examine preferences without specifying solution-level structural metrics [cite/p:@kyritsisPerceivedOptimalityCompeting2022]. Our study addresses this gap by quantifying how three solution-level properties --- HC, CC, and VC --- predict human choices, response speed, and attention when comparing equally optimal packing solutions.
+
+Beyond describing cues that shape interpretability, our aim is practical: enable interpretability-aware optimization. Embedding HC and CC as secondary criteria --- e.g., tie-breaking among equal-value optima or soft penalties in multi-objective formulations --- would let optimizers return solutions that are both optimal and easy to understand [cite/p:@ehrgottMulticriteriaOptimization2005].
+
+** Study Overview: MSSP Task and Paired Evaluation
+
+Our study centered on the multiple subset sum problem described above [cite/p:@johnsonWorstcasePerformanceBounds1974; @capraraMultipleSubsetSum2000]. Each problem instance had 4--6 bins and 7--9 items, fixed capacities, and was specifically generated to ensure at least two distinct optimal solutions. Participants first practiced solving the task and received feedback. The primary evaluation task then presented two different, equally optimal solutions to the same instance side-by-side; participants answered "Which solution is easier to understand?" on a four-level scale (definitely/slightly left/right). This provided a direct behavioral measure of interpretability preference between optimal solutions. Figure ref:fig:experiment summarizes the workflow.
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=1.0\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/fig_experiment.pdf}
+  \caption{\label{fig:experiment}Experimental Workflow}
+\par\footnotesize\textit{Note}. Diagram shows the study workflow including questionnaire (PSI = problem-solving inventory; \cite{heppnerDevelopmentImplicationsPersonal1982}), webcam calibration, seven problem-solving trials with feedback, and twenty-five evaluation trials. The left screen displays an example problem-solving trial. In evaluation trials (right screen), participants judged which of two optimal solutions was easier to understand ("definitely/slightly" left or right).\end{figure}
+#+end_export
+
+** Pre-Registered Hypotheses and Analysis Plan
+We tested our three solution-level properties as drivers of interpretability preferences: HC, CC, and VC, with DD as a visual-layout covariate (full definitions in [[#methods][Methods]]).
+
+Because participants evaluated pairs of equally optimal solutions, our analyses use between-solution differences derived from these solution-level metrics: signed right–left differences for choices and gaze (to predict which option is preferred or inspected more), and absolute differences for reaction times (to test whether larger separations speed decisions). This framing allows us to link interpretable, stimulus-level structure directly to behavioral preferences, processing speed, and attention. We complement preferences with two process measures: Reaction times index overall processing effort and decisional conflict [cite/p:@luceResponseTimesTheir1986]. Webcam-based eye tracking provides aggregate dwell measures that indicate relative attention to the left versus right solution [cite/p:@papoutsakiWebgazerScalableWebcam2016; @ecksteinEyeGazeWhat2017; @gollanGazeQuantifyingConscious2025]. Given lower spatial precision online, we analyze side-wise dwell differences rather than fine-grained scanpaths.
+
+We conducted an exploratory study to refine metrics --- fitting CC's parameters to behavioral data --- followed by a preregistered confirmatory study using the fixed metrics. We hypothesized that, within a pair of equally optimal solutions, participants would prefer the option with lower HC, CC, and VC; that larger absolute differences would speed decisions; and that more complex solutions would attract relatively more dwell time. The Results report confirmatory findings and compare them with exploratory patterns.
+
+
+* Methods
+:PROPERTIES:
+:CUSTOM_ID: methods
+:END:
+** The Multiple Subset Sum Problem (MSSP)
+:PROPERTIES:
+:CUSTOM_ID: problem-definition-a-bin-packing-variant-multiple-subset-sum
+:END:
+As introduced, our study focused on the multiple subset sum problem (MSSP; [cite//bare:@capraraMultipleSubsetSum2000]), a variant of the multi-knapsack problem [cite/p:@cacchianiKnapsackProblemsOverview2022] in which each item's profit equals its size. Given \(m\) bins with capacities \(w_{i}\) and \(n\) items with sizes \(z_{j}\), the task is to select a subset of items and assign each to at most one bin so as not to exceed any bin's capacity and to maximize the total packed size, as formulated in Equation ref:eqn-obj:
+
+#+begin_src latex
+\begin{equation}\label{eqn-obj}
+\begin{aligned}
+\underset{x_{ij} \in \{0,1\}}{\text{maximize}} \quad &\sum_{j=1}^{n} \sum_{i=1}^{m} z_j x_{ij} , \\
+\text{subject to} \quad &\sum_{j=1}^{n} z_{j}x_{ij} \leq w_{i}, \quad &&i = 1, 2, \ldots, m , \\
+&\sum_{i=1}^{m} x_{ij} \leq 1, \quad &&j = 1, 2, \ldots, n .
+\end{aligned}
+\end{equation}
+#+end_src
+
+\noindent Here \(x_{ij}\) equals 1 if item \(j\) is placed in bin \(i\), and 0 otherwise. This fixed-bin, maximization objective differs from the classical bin packing objective of minimizing the number of bins. Figure ref:fig:problem illustrates an instance of our bin-packing variant and its experimental representation. Rows correspond to items and columns to bins. Block lengths and labels indicate item sizes \(z_{j}\), and filled cells (dots) in the assignment matrix indicate assignments \(x_{ij} = 1\). The number shown at the top right is the current score, i.e., the objective value \(\sum_{i,j}\ z_{j}\ x_{ij}\) in Equation ref:eqn-obj.
+
+For the experiment, we randomly generated a large set of problem instances subject to several constraints. Each of these problem instances consisted of between 4 and 6 bins and between 7 and 9 items. In addition, all problem instances satisfied the following conditions: (1) No item size is larger than the largest bin; (2) No bin capacity is smaller than the smallest item; (3) The ratio of the sum of item sizes to sum of bin capacities is between 0.8 and 1.0; (4) There are at least two different optimal solutions. These constraints were chosen to create a sample of problems that are simple yet nontrivial. In particular, setting the size to 4--6 bins and to 7--9 items helps to reduce symmetry (especially given the approximate one-to-one relationship between the sum of item sizes and total bin capacities) and makes it less likely that the optimal solution simply corresponds to a one-to-one mapping between items and bins --- an outcome that would be too obvious to solve or evaluate. We also assume that, in many real-world applications such as resource allocation and scheduling, there are typically more items than bins. A detailed description of how problem instances and their optimal solutions were generated can be found in Appendix ref:sec:stimulus-generation.
+
+** Overview of Experimental Design
+:PROPERTIES:
+:CUSTOM_ID: overview-of-experimental-design
+:END:
+Our web-based within-subjects study comprised two phases, as outlined in the Introduction: an exploratory study to generate hypotheses and a preregistered confirmatory study to test them. The experiment was developed using JavaScript (ReactJS) for the front end and Python (FastAPI) for the back end, with a PostgreSQL database for data storage. Participants accessed the experiment via a link and completed a digital consent form that outlined the study's purpose, methods, benefits, risks, data usage, and rights, as well as the option to withdraw. After providing consent, participants completed the Problem Solving Inventory (PSI; [cite//bare:@heppnerDevelopmentImplicationsPersonal1982]) and received detailed instructions, including an interactive example of our bin-packing variant. Once they were confident that they understood the tasks, which were expected to take approximately 30 minutes, they could proceed by clicking "START." Once the webcam was successfully calibrated for eye tracking, the experimental procedure started. Participants first completed seven /problem-solving trials/ and received feedback after each trial to aid understanding. They documented the problem-solving strategies used during this phase in a free text box. Subsequently, participants engaged in 4 practice /evaluation trials/ followed by 25 actual /evaluation trials/, reporting their preferences between two solutions based on interpretability and documenting their evaluation strategies in another free text box. Finally, participants arrived at the debriefing screen to provide demographic details and report any study-related issues.
+
+
+
+** Experimental Procedure
+:PROPERTIES:
+:CUSTOM_ID: experimental-procedure
+:END:
+*** Recruitment of Participants
+:PROPERTIES:
+:CUSTOM_ID: recruitment-of-participants
+:END:
+The study was advertised to participants on Prolific.com who fulfilled the following conditions (obtained by Prolific using participants' self-report): Fluent in English; normal or corrected-to-normal vision; possession and willingness to use a webcam or built-in camera. At the time of data collection, approximately 52,000 out of 130,000 active Prolific participants satisfied these criteria. To further ensure a good command of English, we also limited our sample to participants from the US and UK. Participants were compensated £4.50 for an estimated completion time of 30 minutes.
+
+
+# TODO:
+
+# in the exploratory phase it was 52,000 out of 130,000
+# in the confirmatory phase it was 43,911 of 153,606 (are exact numbers, but they might change over the course of the data collection, so better provide coarse numbers)
+
+*** Eye-Tracking Calibration
+:PROPERTIES:
+:CUSTOM_ID: eye-tracking-calibration
+:END:
+For webcam-based eye tracking we used the open-source JavaScript library WebGazer.js [cite:@papoutsakiWebgazerScalableWebcam2016]. Before the experimental trials, participants were taken to a calibration screen to check for the presence of an active webcam. Participants then clicked on specified points on the screen several times to calibrate the eye-tracking system. WebGazer.js uses a self-calibrating methodology that assumes the person is fixating on the points of the screen where they click. Participants subsequently received feedback about the accuracy of the webcam in five levels (/excellent/, /solid/, /average/, /below average/, /poor/), based on an accuracy score provided by WebGazer.js. This score ranges from 0 to 100, indicating the match between predicted and actual gaze targets during calibration. We defined these levels quantitatively: /excellent/ corresponded to an accuracy of 93 or above, /solid/ ranges from 83 to less than 93, /average/ spanned from 75 to less than 83, /below average/ was from 60 to less than 75, and /poor/ was below 60. For the three lowest ratings, a suggestion to repeat the calibration appeared in the dialog, though participants could decide whether to repeat the process.
+
+*** Experimental Trials
+:PROPERTIES:
+:CUSTOM_ID: experimental-trials
+:END:
+**** Problem-Solving Trials
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+To become familiar with our bin-packing variant, participants had to solve seven different problem instances themselves (see Figure ref:fig:experiment). They were the same for all participants and were presented in increasing difficulty (the ratio of the sum of all item sizes to the sum of all bin capacities). There was no time limit and after each trial, participants were informed whether their solution was an optimal one; if not, they were shown an optimal solution side by side with their own solution. This feedback was intended to give participants a better understanding of the problem.
+
+**** Evaluation Trials
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+To answer the question of which solutions are more interpretable than others, the participants were shown a pair of optimal solutions to the same problem in each of the 25 /evaluation trials/. The participants had to answer the question "Which of the two solutions do you find easier to understand?" by clicking on one of four buttons that were positioned above the solution pair and had the following labels: /definitely left/, /slightly left/, /slightly right/ and /definitely right/ (see Figure ref:fig:experiment). Among the 25 /evaluation trials/, two were /catch trials/ aimed at verifying participant attention. In these trials, both solutions were identical, and participants were required to click a fifth button labeled "Duplicated solutions," located beneath the solution pair (/duplicated solutions button/). To ensure that participants understood how to respond during the /catch trials/, a practice section preceded the /evaluation trials/. In this section, participants completed four practice trials, two of which were /catch trials/. After each trial, participants received feedback on whether their response was appropriate. If the practice section was not completed correctly, it had to be repeated.
+
+Three of the 25 /evaluation trials/ were /coherence trials/, designed to assess the coherence of participant judgments. Participants evaluated three linked solution pairs, with coherent judgments following a logical ordering. For example, if participants rated the first solution as easier to understand than the second, the second as easier than the third, and the first as easier than the third, this indicated coherence in their evaluations across pairs. Analyzing /coherence trials/ let us estimate the proportion of participants who respond consistently. This proportion sets the theoretical ceiling on the variance our models can capture, because it represents variance driven by systematic, stimulus-related factors. Any variance beyond this ceiling must come from random noise in participants' decisions.
+
+As in the /problem-solving trials/, there was no time limit for the participants. The coherence and /catch trials/ were identical for all participants and were presented at the same point in the experiment, while the remaining 20 trials for each participant were randomly sampled from the pool of possible pairs. See Appendix ref:sec:trial-generation for a detailed description of how the trials were generated.
+
+*** Questionnaires
+:PROPERTIES:
+:CUSTOM_ID: questionnaires
+:END:
+We used the Problem-Solving Inventory (PSI; [cite//bare:@heppnerDevelopmentImplicationsPersonal1982]) to assess participants' /self-reported problem-solving skills/ as it provided a detailed understanding of their perceived competency in addressing and resolving life challenges. The PSI consists of 31 items, rated on a six-point Likert scale from "strongly disagree" to "strongly agree." These items are broadly divided into three factors: "Problem-solving confidence," "Approach-avoidance style," and "Personal control." Overall scores range from 31 to 186, with higher values indicating a more favorable self-perception of one's problem-solving abilities. This measure allows for an introspective assessment of individual differences in metacognitive and reflective aspects of problem solving. The overall PSI score was used as a moderator (/self-reported problem-solving skills/) in later analyses. After the /problem-solving/ and /evaluation trial/ blocks, participants responded to free text response boxes, where they described the strategies they used to perform the tasks. This qualitative data may offer insights into the various problem-solving strategies used by the participants for future research. Finally, the debrief questionnaire collected additional demographic data and feedback on participants' overall experience, including enjoyment, interest, clarity of instructions, and study length, using Likert-scale items.
+
+** Measures
+:PROPERTIES:
+:CUSTOM_ID: measures
+:END:
+To make the data hierarchy explicit we distinguish four nested levels of variables. Participant-level variables are constant for each person (e.g., age, expertise). Problem-level variables take one value per problem instance (e.g., number of items and bins). Solution-pair-level variables are computed once for the two solutions taken together such as their maximum, sum, or difference --- and are therefore shared by both solutions in that trial. Solution-level variables describe a single solution within the pair (e.g., score of the left solution, format of the right). While not reported as primary measures, they are fundamental to the calculation of the solution-pair-level variables presented below. All measures reported below are tagged with these level names so that their place in the data structure is unambiguous.
+
+
+
+*** Dependent Variables
+:PROPERTIES:
+:CUSTOM_ID: dependent-variables
+:END:
+**** Choice (Solution-Pair-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+
+The outcome variable, /choice/, captured participants' responses during /evaluation trials/ using four ordered categories: /definitely left/, /slightly left/, /slightly right/, and /definitely right/. This variable was treated as an ordinal factor in all statistical analyses and coded in ascending order: /definitely left/ < /slightly left/ < /slightly right/ < /definitely right/.
+
+**** Reaction Time (Solution-Pair-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+The continuous variable /reaction time/ (RT) is the elapsed time during the /evaluation trial/ that a person needed to make their choice, recorded in milliseconds from stimulus presentation to participant response. The natural logarithm of reaction time was used in analyses to normalize the positively skewed distribution typical of response time data.
+
+**** Gaze Bias (Solution-Pair-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+
+
+This solution-pair-level metric is quantified as the relative difference in gaze sample counts between the right and left stimuli, derived from eye-tracking data. For each trial, gaze samples are assigned to either the left ($L$) or the right ($R$) solution. For statistical analysis, these counts are modeled using a binomial generalized linear mixed model (GLMM) with a logit link function on the vector $(R, L)$. For descriptive reporting, a continuous bias value,
+
+#+begin_export latex
+\begin{equation}\label{eqn-gaze-bias}
+b = \frac{R - L}{R + L},
+\end{equation}
+#+end_export
+
+\noindent can be computed, ranging from -1 to 1. Trials with no fixations ($R+L=0$) are excluded from the analysis.
+
+
+*** Complexity Models
+:PROPERTIES:
+:CUSTOM_ID: complexity-models
+:END:
+
+We operationalize complexity using three distinct solution-level metrics: /heuristic-related complexity/ (HC), /compositional complexity/ (CC), and /visual-order complexity/ (VC) (see Figure ref:fig:complexity). Each metric sheds light on a different facet of complexity, helping to build a nuanced understanding of the stimuli under investigation. Our analysis of interpretability-based preferences centered on these three metrics. Below, we detail the derivation of each complexity measure for a single solution. To serve as solution-pair-level predictors in our statistical models, we then compute differences between the paired solutions presented in each evaluation trial: signed differences (right minus left) for choice and gaze (reflecting directional preference), and absolute differences for reaction time (indexing processing effort).
+
+**** Heuristic-Related Complexity (HC, Solution-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+
+To compute HC for a given solution, we first construct a greedy reference solution using a /Largest Bin First, Largest Item First/ (LBF-LIF) strategy [cite/p:@johnsonWorstcasePerformanceBounds1974;@coffmanApproximationAlgorithmsBin1997]. This involves ordering bins by capacity (descending) and items by size (descending). We then iterate through the sorted bins; for each bin, we greedily fill it by placing the largest available unassigned items that fit, until no more items can be placed in that bin. We then proceed to fill the next sorted bin. Ties (equal capacities or loads) are broken by stable input order. We then represent both the given and the greedy solutions as bipartite graphs (bins/items as nodes; assignments as edges) and compute their graph edit distance with unit costs for node/edge insertion and deletion. HC is the resulting distance, with larger values indicating greater deviation from the greedy reference. We compute HC on the sorted representation to ensure it is invariant to the visual re-ordering used in the display. For statistical analyses, its signed right-left difference is denoted $\Delta\text{HC}$ and its absolute difference $|\Delta\text{HC}|$.
+
+
+**** Control Covariate: Diagonal Dissimilarity (DD, Solution-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+
+
+Since the assignment matrix in heuristic solutions to ordered problem instances (i.e., bins and items sorted in descending order by size) often resembles a diagonal line (from the top-left corner to the bottom-right corner; see Figure ref:fig:complexity), we included, as a control covariate for HC, the graph edit distance to an approximated diagonal (Appendix ref:sec:approximated-diagonal). Crucially, this distance is always computed on the assignment matrix exactly as presented to the participant: if a visual permutation (disordering of bins and/or items) was applied to the display, the permuted display is compared to the diagonal reference (i.e., its deviation from the diagonal is measured), not the underlying ordered solution. This ensures that DD captures deviation in the stimulus the participant actually sees, rather than properties of a latent, ordered representation.
+
+Note that, by contrast, HC is defined against a greedy reference that orders bins/items internally from largest to smallest before assignment, independent of display. HC is therefore invariant to visual permutations. This distinction is useful to disentangle a preference for diagonal-like visual layouts (captured by DD) from a preference for heuristic-aligned structure (captured by HC). In disordered solutions, it is less likely that a heuristic-aligned solution also looks diagonal.
+
+For statistical analyses, its signed right-left difference is denoted $\Delta\text{DD}$ and its absolute difference $|\Delta\text{DD}|$.
+
+**** Compositional Complexity (CC, Solution-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+This metric assesses the complexity based on the composition of items in each bin. To do so, each bin is interpreted as the outcome of a generative model, and the degree of surprisal associated with that outcome is measured. In this context, greater surprisal reflects higher complexity, as it indicates deviations from the expected patterns dictated by the model. Conversely, a low level of surprisal signifies simplicity, suggesting that the bin conforms closely to these preferred patterns. A bin is characterized by three quantities: (a) the number of items, \(N\); (b) the vector of relative item sizes, \(C\), which sums to one when the bin is nonempty; and (c) the unused capacity fraction, E. Assuming conditional independence, the joint density factorizes as
+
+#+begin_export latex
+\begin{equation}\label{eqn-joint-probability}
+p(N,\ C,\ E)\  = \ p(N)\  \cdot \ p(C\ |\ N)\  \cdot \ p(E\ |\ N).
+\end{equation}
+#+end_export
+
+***** Number of Items
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+\(N\) follows a geometric law starting at zero. The distribution assigns higher probability to small item counts; thus, bins that hold many items contribute more to the surprise score.
+
+***** Composition of Loads
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+For $N > 0$, the vector C is drawn from a symmetric Dirichlet distribution with concentration $\alpha$. When $\alpha > 1$, the model prefers evenly split loads; when $\alpha < 1$, it favors one dominating load and several very small ones. An optional correction removes the baseline probability of the perfectly even split, ensuring that surprise, and thus complexity, reflects deviations from the preferred pattern rather than the size of the simplex. For empty bins ($N = 0$), this term is absent.
+
+***** Empty Space
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+The unused fraction E is described by a two-component mixture placing equal probability mass near 0 and 1. Consequently, bins that are almost full or almost empty are regarded as simple, whereas bins that are half-filled are deemed more surprising and therefore complex. Each component can take the form of a truncated normal, a truncated Laplace, or a continuous Bernoulli distribution; a common scale parameter \(\sigma\) controls how sharply the mass concentrates around the extremes (selection of these parameters is addressed below). For a single bin, the negative log-probability
+
+#+begin_export latex
+\begin{equation}\label{eqn-complexity-single-bin}
+L\  = -\left[\ln p(N)\  + \ \ln p(C\ |\ N)\  + \ \ln p(E\ |\ N)\right]
+\end{equation}
+#+end_export
+
+quantifies its surprise and therefore complexity --- in nats. The CC of an entire solution is the mean of \(L\) over all bins. Solutions consisting of few-item bins that are either nearly empty or nearly full, and whose item sizes conform to the symmetry favored by the Dirichlet prior, yield low surprise values, while deviations from these simple patterns result in higher values.
+***** Fitted Parameters
+As noted above, the model includes several tunable parameters that influence the complexity evaluation. The empty space fraction can be described using different distributions, such as truncated normal, truncated Laplace, or continuous Bernoulli. The scale parameter controls the concentration of probability mass in these distributions. Additionally, parameter $p$ determines how strongly the geometric law penalizes bins with many items, and parameter $\alpha$ sets the preference for symmetry in the composition of loads using the Dirichlet distribution. Prior to each experiment (exploratory or confirmatory), a dedicated fitting procedure was conducted to determine these parameters (see Appendix ref:sec:calibration for details). 
+
+We provide information on the parameters used in the exploratory study in Appendix ref:sec:exploratory-study.
+
+For our confirmatory analysis, this procedure yielded the following parameters: {{{s(desc_c,cc_params.empty_dist)}}} distribution for empty space {{{s(desc_c,cc_params.dirichlet_corr)}}} Dirichlet correction, scale parameter $\sigma=$ {{{f(desc_c,cc_params.empty_param,%.3f)}}}, $p=$ {{{f(desc_c,cc_params.geom_p,%.3f)}}} and $\alpha=$ {{{f(desc_c,cc_params.comp_alpha,%.3f)}}}. Thus, in the confirmatory study our fitted CC primarily assigned higher complexity to mid-fill bins, while many-item bins, and uneven splits (heterogeneous item sizes) were treated almost neutrally.
+
+For statistical analyses, its signed right-left difference is denoted $\Delta\text{CC}$ and its absolute difference $|\Delta\text{CC}|$.
+
+**** Visual-Order Complexity (VC, Solution-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+This metric assesses the disorder of items and bins in a visual representation of a problem instance using an adapted version of Kendall's \tau (rank correlation). Let $w = (w_{1},\ldots,w_{m})$ be the bin sizes and $z = (z_{1},\ldots,z_{n})$ the item sizes. For any sequence $a = (a_{1},\ldots,a_{k})$ $(k \ge 2$) define
+
+#+begin_export latex
+\begin{equation}\label{eqn-voc-1}
+a_{i,asc} = a_{i} + i\ \varepsilon, \quad a_{i,desc} = a_{i} + (k-i + 1)\varepsilon
+\end{equation}
+#+end_export
+
+
+\noindent with \(\varepsilon\  = 10^{- 5}\). The corresponding rank correlations are
+
+#+begin_export latex
+\begin{equation}\label{eqn-voc-2}
+\tau_{asc}(a) = \tau(a_{asc},\ (1,\ 2,\ \ldots,\ k)), \ \tau_{desc}(a)\  = \tau(a_{desc},\ (k,\ \ldots,\ 2,\ 1))
+\end{equation}
+#+end_export
+
+\noindent Disorder is quantified as
+
+#+begin_export latex
+\begin{equation}\label{eqn-voc-3}
+d(a) = 1\  - max(|\tau_{asc}(a)|,|\tau_{desc}(a)|).
+\end{equation}
+#+end_export
+
+
+\noindent Finally, the /visual-order complexity/ (\(VC\)) of a solution is
+
+#+begin_export latex
+\begin{equation}\label{eqn-voc-4}
+VC\  = \frac{m\ d(w)\  + \ n\ d(z)}{m\  + \ n},
+\end{equation}
+#+end_export
+
+\noindent where \(m = |w|\) and \(n = |z|\).
+
+This adaptation treats adjacent bins or items of identical size as already ordered by adding a tiny offset to break the tie (Equation ref:eqn-voc-1). Kendall's \tau is then computed against both an ascending and a descending reference, and the larger correlation is kept (Equation ref:eqn-voc-2); disorder for that sequence is defined as \(1 - \tau\) (Equation ref:eqn-voc-3). Applying this procedure to the bin sequence and the item sequence and weighting the two disorder scores by their respective counts yields the VC (Equation ref:eqn-voc-4). This expression quantifies the overall disorder of a given visual representation of a problem instance relative to an ideally ordered state. For statistical analyses, its signed right-left difference is denoted $\Delta\text{VC}$ and its absolute difference $|\Delta\text{VC}|$.
+
+*** Further Measures
+:PROPERTIES:
+:CUSTOM_ID: further-measures
+:END:
+**** Maximum Disorder (MD, Solution-Pair-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+This solution-pair-level metric is derived from the VC of two solutions. Rather than taking the difference between the right and left solutions, it is defined as $max(VC_L, VC_R)$. We were specifically interested in how this moderator influenced HC, CC and DD. The rationale here was that disorder may impair comparisons. For a comparison between two instances to be impaired, it is sufficient for one of the instances to have a characteristic that renders the comparison difficult. Although MD and the difference in VC between two solutions capture slightly different aspects, they are derived from the same data. Therefore, we did not consider interactions of MD with $\Delta\text{VC}$ and $|\Delta\text{VC}|$ in later model analyses, as we did not expect to draw any meaningful conclusions from them.
+**** Problem Difficulty (PD, Problem-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+This problem-level metric was operationalized as the ratio of the sum of item sizes to the sum of all bin capacities. This continuous metric ranges from 0.8 to 1.0, with higher values denoting greater difficulty of a particular problem instance. This ratio captures the inherent challenge within our packing task by reflecting the relative tightness of the space to be filled. A higher ratio implies that the items collectively approach or exceed the available capacity more closely, thereby increasing the demand for optimal packing strategies, a nuance that aligns well with theoretical perspectives on resource constraints and cognitive load [cite:@swellerCognitiveLoadProblem1988]. This metric was also applied during problem instance generation (Appendix ref:sec:stimulus-generation); only problem instances with a load-capacity between 0.8 and 1.0 were retained.
+
+**** Heuristic Optimality (HO, Problem-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+
+This measure assesses the quality of a heuristic solution for a given problem instance. It is the ratio of the heuristic score to the optimal score, with values ranging from 0.0 to 1.0. A value of 1.0 indicates that the heuristic achieves the optimal solution, while values closer to 1.0 signify a higher quality solution that is closer to the optimum. Lower values suggest the heuristic is inefficient for that problem instance.
+
+**** Self-Reported Problem-Solving Skills (PSI, Participant-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+This participant-level metric was assessed using the participants' scores in the PSI questionnaire.
+
+**** Problem-Solving Efficiency (PSE, Participant-Level)
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+This participant-level metric provides a difficulty-weighted composite index, integrating solution optimality and reaction time (RT) across the seven /problem-solving trials/, with harder trials contributing proportionally more to the final score. For trial \(i\), instantaneous efficiency was defined as
+
+#+begin_export latex
+\begin{equation}\label{eqn-efficiency-1}
+E_{i,j} = \frac{S_{i,j}}{O_{i}} \div RT_{i,j},
+\end{equation}
+#+end_export
+
+\noindent where \(S_{i,j}\) is the score obtained by participant \(j\), \(O_{i}\) is the optimal score for the problem instance in trial \(i\), and \(RT_{i,j}\) is the reaction time (RT) (ms). Trial-specific difficulty weights (\(w_{i}\)) were derived from group efficiency,
+
+#+begin_export latex
+\begin{equation}\label{eqn-efficiency-2}
+w_{i} = \frac{1\ -\ \bar{E}_{i}}{\sum_{k}^{}1\ -\ \bar{E}_{k}},
+\end{equation}
+#+end_export
+
+\noindent with $\bar{E}_{i}$ denoting the mean $E$ across participants on trial $i$; harder trials therefore received larger weights. A participant's overall PSE ($\eta_{j}$) was the weighted sum
+
+#+begin_export latex
+\begin{equation}\label{eqn-efficiency-3}
+\eta_{j}\  = \sum_{i = 1}^{7}w_{i}\ E_{i,j}.
+\end{equation}
+#+end_export
+
+\noindent Higher values capture the ability to find solutions that are both closer to optimal and achieved more quickly, particularly on the most demanding problems.
+
+** Data Analysis
+:PROPERTIES:
+:CUSTOM_ID: data-analysis
+:END:
+*** Data Exclusion and Preprocessing
+:PROPERTIES:
+:CUSTOM_ID: data-exclusion-and-preprocessing
+:END:
+To maintain data integrity in this study, several exclusion criteria were applied. Participants were excluded if they failed to click the /duplicated solutions button/ in both /catch trials/. Participants were also excluded if they used this button in at least two non-/catch trials/. Furthermore, individual trials were excluded from the analysis if participants clicked the /duplicated solutions button/. Data from participants who did not complete all trials were also discarded. For the gaze analyses specifically, any trials with no on-stimulus gaze ($R+L = 0$) were excluded. These criteria collectively ensured that only complete and reliable data were included in the final analysis.
+
+To prepare for statistical analysis, all predictors were z-standardized across the full sample to make them comparable. For the three complexity measures and /diagonal dissimilarity/, individual values were standardized using pooled means and standard deviations from both the left and right solutions. This specific standardization method ensures a meaningful zero point, which indicates there is no difference between the two solutions being compared. After standardization, signed right–left differences were computed for the choice and gaze analyses, while absolute differences were calculated for the reaction-time analysis. Gaze was analyzed as a binomial response. Successes were defined as the number of gaze samples on the right solution ($R$), and the total number of gaze samples was the sum of samples on both the right and left solutions ($R+L$). This was modeled with a logit link, where $p=R/(R+L)$. Unlike other predictors, the gaze outcome was not z-standardized. For figures and reporting, gaze is expressed as a bias, $b=(R-L)/(R+L)$, with a range from -1 to 1.
+
+*** Linear Mixed-Effects Models
+:PROPERTIES:
+:CUSTOM_ID: linear-mixed-effects-models
+:END:
+For each analysis we fitted mixed-effects models in R v4.3.2 [cite/p:@rcoreteamLanguageEnvironmentStatistical2023]. Predictors were z-standardized across the full sample and entered as fixed effects. We used random intercepts for participants in all models and, where convergence allowed, random slopes for the included complexity main effects (and DD, if present); interactions were not given random slopes. Appendix ref:sec:model-comparison details the uniform random-effects procedure that remained consistent across the candidate models, as well as the selection routine based on the Akaike Information Criterion (AIC). This routine compared a set of candidate models motivated by theory. If the best-fitting model was at least 2 AIC units better than every alternative ($\Delta\text{AIC} > 2$), it was retained. When two or more models lay within 2 AIC units of the minimum ($\Delta\text{AIC} \le 2$), they were considered equally supported [cite/p:@burnhamModelSelectionMultimodel2004] and the simplest (fewest parameters) among them was chosen. Ordinal outcomes were analyzed with ~clmm~ from the /ordinal/ package ([cite//bare:@christensenOrdinalRegressionModels2023]; ~thresholds = "symmetric"~, ~link = logit~, Laplace approximation), continuous outcomes with ~lmer~ from lme4 ([cite//bare:@batesFittingLinearMixedeffects2015]; ~REML = FALSE~), and binomial counts with ~glmer~ from lme4 (~family = binomial~). We report Nakagawa's marginal and conditional $R^2$ for all three model classes using the /performance/ package [cite/p:@ludeckePerformancePackageAssessment2021]. The coherence-ceiling comparison is applied to the choice model because it isolates variance attributable to stimulus structure (fixed effects).
+
+# TODO: add below (not preregistered)? For the binomial gaze model, we also report the residual dispersion ratio from /performance::check_overdispersion/ (ratio > 1 indicates overdispersion, < 1 underdispersion).
+
+For paired presentations, the three complexity predictors and DD were coded as signed right--left differences for the choice and gaze analyses, and as absolute between-solution differences for the reaction-time analysis. Moderators were participant/problem-level and not differenced.
+
+
+**** Predicting Choice Using Complexity
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+To test whether complexity is associated with lower preferences, we used /choice/ as the ordinal outcome variable. The candidate models combined, in all theoretically relevant ways, the four focal predictors HC, CC, VC, and the covariate DD --- with the potential moderators PD, PSI, PSE, HO, and MD. Only two-way interactions between each complexity predictor and each moderator were considered; no interactions between main effects were included, and no interactions with DD. MD was never entered together with VC because both metrics stemmed from the same data and were partly redundant. 
+
+
+**** Predicting Reaction Times Using Complexity
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+To evaluate whether larger between-solution differences facilitate decisions, we treated the logarithm of reaction time (RT) as a continuous dependent variable. The focal predictors were the absolute differences between the two solutions in HC, CC, VC, and the covariate DD. As additional covariates, each model could include PD, PSI, PSE, HO, and MD. No interactions were included. Consistent with our redundancy constraint, MD never entered together with VC (here: its absolute difference). 
+**** Predicting Gaze Bias Using Complexity
+:PROPERTIES:
+:CLASS: runin apa
+:END:
+To test whether stimulus complexity drives differential visual attention, we analyzed the allocation of gaze using a binomial GLMM on the counts of dwell times on the right (R) and left (L) solutions. This model effectively predicted the probability of gaze falling on the right solution, given the total gaze samples on both sides. This GLMM employed a logit link function and was implemented using ~glmer~ from the lme4 package. Our model selection included several fixed effects: the signed right-left differences in HC, CC, VC, and the covariate DD. The same set of potential moderators as in the choice model was included, with two-way interactions between each complexity difference and each moderator. We did not include interactions between main effects, and interactions with DD. To avoid collinearity, MD was not included in the same model as VC. The random effects structure of the model included participant intercepts and, where feasible, random slopes for the complexity differences.
+
+*** Coherence Ceiling Estimation
+:PROPERTIES:
+:CUSTOM_ID: coherence-ceiling-estimation
+:END:
+We inspected the three /coherence trials/ (see Evaluation Trials) and checked whether each participant's set of pair-wise ratings was transitive. The resulting proportion of participants meeting this criterion (\(p_{cog}\)) constituted an empirical ceiling on the variance that could be attributed to stimulus properties. We therefore compared \(p_{cog}\) to the marginal Nakagawa $R^2$ of the GLMM predicting ordinal choices from solution complexity, because the marginal $R^2$ isolates variance explained by the fixed effect (complexity) alone, whereas the conditional $R^2$ would also include variance due to random participant factors and would thus exceed what is theoretically explainable [cite/p:@nakagawaGeneralSimpleMethod2013]. This analysis was conducted with the R packages /ordinal/ [cite/p:@christensenOrdinalRegressionModels2023] and /performance/ [cite/p:@ludeckePerformancePackageAssessment2021].
+
+** Sample
+
+*** Participants
+:PROPERTIES:
+:CUSTOM_ID: participants
+:END:
+Following the exploratory study (see Appendix ref:sec:exploratory-study), which involved {{{n(demo_e,counts.N_included)}}} participants and {{{n(choice_e,n_obs)}}} observations (evaluation trials), and uncovered a significant link between complexity and interpretability preferences, we designed a confirmatory study with the same sample size. This decision was based on the need to verify the reproducibility of findings observed in the exploratory study. Prior to the data collection for the confirmatory study, hypotheses and analysis plans were pre-registered to mitigate biases and provide transparency.
+
+A total of {{{n(demo_c,counts.N_completed)}}} participants recruited from Prolific completed the study, with {{{n(demo_c,counts.N_included)}}} remaining after outlier exclusion (exclusion rate = {{{pct(demo_c,counts.exclusion_rate,%.1f%%)}}}). Ages ranged from {{{n(demo_c,age.min)}}} to {{{n(demo_c,age.max)}}} years (M = {{{f(demo_c,age.mean,%.2f)}}}, SD = {{{f(demo_c,age.sd,%.2f)}}}), and the sample consisted of {{{pct(demo_c,sex.prop.male,%.2f%%)}}} male and {{{pct(demo_c,sex.prop.female,%.2f%%)}}} female. Participants predominantly identified as White ({{{pct(demo_c,ethnicity.prop.white,%.2f%%)}}}). The majority resided in the UK ({{{pct(demo_c,residence.prop.uk,%.2f%%)}}}), with the remainder living in the US ({{{pct(demo_c,residence.prop.us,%.2f%%)}}}). Education levels varied: {{{pct(demo_c,education_highest.prop.secondary,%.2f%%)}}} completed secondary education, {{{pct(demo_c,education_highest.prop.high_school,%.2f%%)}}} earned a high school diploma or A-levels, {{{pct(demo_c,education_highest.prop.technical_college,%.2f%%)}}} completed technical or community college, {{{pct(demo_c,education_highest.prop.undergrad,%.2f%%)}}} held undergraduate degrees, {{{pct(demo_c,education_highest.prop.graduate,%.2f%%)}}} had graduate degrees, and {{{pct(demo_c,education_highest.prop.doctorate,%.2f%%)}}} achieved a doctorate; {{{pct(demo_c,education_highest.prop.no_qualifications,%.2f%%)}}} had no formal qualifications. Employment status showed {{{pct(demo_c,employment_status.prop.full_time,%.2f%%)}}} in full-time work. Most participants were right-handed ({{{pct(demo_c,handedness.prop.right,%.2f%%)}}}), with some left-handed ({{{pct(demo_c,handedness.prop.left,%.2f%%)}}}) and ambidextrous ({{{pct(demo_c,handedness.prop.ambidextrous,%.2f%%)}}}). Participants took an average of {{{f(demo_c,time_taken.mean,%.2f)}}} minutes to complete the experiment (SD = {{{f(demo_c,time_taken.sd,%.2f)}}}). Furthermore, none of the participants in the exploratory study were permitted to participate in this confirmatory study.
+
+*** Evaluation Trials
+
+In the confirmatory study, a pool of 5,000 evaluation trials for a maximum of 200 participants was generated (details in Appendix ref:sec:trial-generation). The range and distribution of our primary predictors across trials in our confirmatory sample ({{{n(choice_c,n_obs)}}} trials from {{{n(choice_c,n_participants)}}} participants) are shown in Appendix ref:sec:supplementary-results (Figures ref:fig:scatter-matrix-signed and ref:fig:scatter-matrix-abs). 
+
+** Ethical Considerations
+:PROPERTIES:
+:CUSTOM_ID: ethical-considerations
+:END:
+The study was conducted in accordance with the Declaration of Helsinki and approved by the Ethics Committee of the University of Vienna (IRB number: 01073).
+
+* Results
+:PROPERTIES:
+:CUSTOM_ID: results
+:END:
+
+** Preference for Simpler Solutions
+:PROPERTIES:
+:CUSTOM_ID: preference-for-simpler-solutions
+:END:
+
+# COMMENT: "reduced the odds of selecting the more complex solution" is not 100% correct, it should be "a category in the direction of the more complex stimmulis", but it is also not wrong and more readable.
+
+We tested z-scored right–left differences in /heuristic-related complexity/ (HC), /compositional complexity/ (CC), and /visual-order complexity/ (VC), plus /diagonal dissimilarity/ (DD), using an ordinal mixed-effects model with Akaike Information Criterion (AIC)-based selection (Table ref:tab:choice-confirmatory). As hypothesized, participants preferred the simpler option: all three complexity differences (HC, CC, VC) had negative coefficients, whereas DD was not reliable. An increase of one standard deviation in the difference reduced the odds of selecting the more complex solution by {{{pct(choice_c,coefs.diff_ac_RvL_z.exp_pct_abs,%.0f%%)}}} (HC), {{{pct(choice_c,coefs.diff_cc_v2_RvL_opt_z.exp_pct_abs,%.0f%%)}}} (CC), and {{{pct(choice_c,coefs.diff_disorder_RvL_z.exp_pct_abs,%.0f%%)}}} (VC). Across {{{n(choice_c,n_obs)}}} observations from {{{n(demo_c,counts.N_included)}}} participants, model fit was {{{f(choice_c,r2.marg,%.3f)}}} (marginal $R^2$) and {{{f(choice_c,r2.cond,%.3f)}}} (conditional $R^2$), with the marginal $R^2$ well below the empirical coherence ceiling (proportion of participants with transitive responses; see [[#coherence-ceiling-estimation][Coherence Ceiling Estimation]] in Methods) of {{{f(coherence_c,p_coherent,%.3f)}}}, indicating residual decision noise. Figure ref:fig:choice-probabilities-confirmatory shows predicted probabilities shifting toward the less complex option with increasing difference, and Figure ref:fig:choice-examples-confirmatory illustrates representative stimulus pairs.
+
+The confirmatory findings generally align with the exploratory analysis. However, one notable deviation was that the main effect of DD was not statistically significant in the confirmatory sample. Conversely, CC demonstrated a comparatively stronger influence, particularly after its parameters were calibrated based on the exploratory data. Cross-study summary plots are shown in Appendix ref:sec:cross-study-summary. 
+
+
+#+INCLUDE: "~/Dropbox/data_export/joptim-analysis/pub/confirmatory/mlm_choice/tab_choice.tex" src latex
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=1.0\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/confirmatory/mlm_choice/fig_choice_probability_panels.pdf}
+  \caption{\label{fig:choice-probabilities-confirmatory} Predicted Choice Probabilities as a Function of Complexity Difference}
+\par\footnotesize\textit{Note}. Panels correspond to the three complexity metrics (HC = heuristic-related complexity, CC = compositional complexity, VC = visual-order complexity) and the covariate diagonal dissimilarity (DD). Colored lines give the model-predicted probability of the four behavioral responses (‘definitely left', ‘slightly left', ‘slightly right', ‘definitely right'); shaded ribbons denote 95\% confidence intervals.\end{figure}
+#+end_export
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[height=0.75\textheight]{~/Dropbox/data_export/joptim-analysis/pub/confirmatory/mlm_choice/fig_example_solutions_per_metric.pdf}
+  \caption{\label{fig:choice-examples-confirmatory}Example Pairs with Model-Predicted Choice Probabilities}
+  \par\footnotesize\textit{Note}. Example stimulus pairs used in the experiment across the three complexity metrics (HC = heuristic-related complexity, CC = compositional complexity, VC = visual-order complexity) and the covariate diagonal dissimilarity (DD). Each panel shows the left–right solutions and their complexity difference (R–L; negative = left more complex) signified by the triangle marker. The horizontal bar displays model-predicted choice probabilities (\%) for definitely/slightly choosing left or right (corresponding to Figure \ref{fig:choice-probabilities-confirmatory}).\end{figure}
+#+end_export
+
+** Reaction Time: Faster Responses with Larger Heuristic Differences
+:PROPERTIES:
+:CUSTOM_ID: response-time-results
+:END:
+
+We analyzed log reaction time (RT) using a linear mixed-effects model on absolute between-solution differences in HC, CC, VC, and DD (AIC-based selection). This tested the decision-speed hypothesis that larger separations facilitate choices. As hypothesized, larger $|\Delta\text{HC}|$ predicted faster responses, amounting to an average {{{pct(rt_c,coefs.abs_diff_ac_RvL_z.exp_pct_abs,%.0f%%)}}} reduction in RT per SD in $|\Delta\text{HC}|$. In contrast, $|\Delta\text{CC}|$, $|\Delta\text{VC}|$, and $|\Delta\text{DD}|$ did not predict faster responses; while higher problem-solving efficiency (PSE) did (Table ref:tab:rt-confirmatory). Fit was modest (marginal $R^2 =$ {{{f(rt_c,r2.marg,%.3f)}}}; conditional $R^2 =$ {{{f(rt_c,r2.cond,%.3f)}}}) across {{{n(rt_c,n_obs)}}} trials from {{{n(rt_c,n_participants)}}} participants.
+
+These results contrast with our exploratory analysis, where larger absolute differences in all three complexity metrics --- HC, CC, and VC --- were associated with faster responses. Cross-study summary plots are shown in Appendix ref:sec:cross-study-summary.
+
+#+INCLUDE: "~/Dropbox/data_export/joptim-analysis/pub/confirmatory/mlm_rt/tab_rt.tex" src latex
+
+** No Evidence for Complexity Effects on Gaze Dwell Times
+:PROPERTIES:
+:CUSTOM_ID: gaze-dwell-time-no-effects-of-complexity
+:END:
+
+We modeled side-wise dwell with a binomial generalized linear mixed-effects model (GLMM) on the counts of gaze samples on the right (R) and left (L) solutions, using a logit link; equivalently, the outcome is $p = R/(R+L)$. This tested whether signed differences in complexity predicted attentional asymmetry. The AIC-based comparison retained the intercept-only specification across {{{n(gaze_c,n_obs)}}} observations from {{{n(gaze_c,n_participants)}}} participants (AIC = {{{f(gaze_c,aic,%.0f)}}}), indicating no reliable complexity effects on gaze bias. The intercept was significantly negative (b = {{{f(gaze_c,coefs.(Intercept).estimate,%.3f)}}}, $p$ = {{{p(gaze_c,coefs.(Intercept).p_value)}}}, 95% confidence interval (CI) [{{{f(gaze_c,coefs.(Intercept).conf_low,%.3f)}}}, {{{f(gaze_c,coefs.(Intercept).conf_high,%.3f)}}}]), consistent with a small overall left-gaze tendency. Fit indices were low (marginal $R^2 =$ {{{f(gaze_c,r2.marg,%.3f)}}}; conditional $R^2 =$ {{{f(gaze_c,r2.cond,%.3f)}}}). Because the final model contains no complexity predictors, a table is omitted.
+
+
+# TODO: consider adding below (not pregistered, see methods TODO)
+# A dispersion check indicated underdispersion (ratio $\approx {{{f(gaze_c,overdispersion,%.2f)}}}$), which is common in binomial counts when variability is lower than expected; this does not alter the substantive conclusion.
+
+These results are consistent with the exploratory analysis, which likewise retained an intercept-only model.
+
+
+# If another model than the intercept model turns out best, uncomment below table
+
+# #+include: "~/dropbox/data_export/joptim-analysis/pub/confirmatory/mlm_gaze/tab_gaze.tex" src latex
+
+** Behavioral Distributions and Correlations Between Predictors
+
+Choice proportions were: definitely left {{{pct(desc_c,trials.choice_props.def_left,%.1f%%)}}}, slightly left {{{pct(desc_c,trials.choice_props.sl_left,%.1f%%)}}}, slightly right {{{pct(desc_c,trials.choice_props.sl_right,%.1f%%)}}}, definitely right {{{pct(desc_c,trials.choice_props.def_right,%.1f%%)}}}. The log reaction time had M = {{{f(desc_c,trials.rt_log.mean,%.2f)}}} and SD = {{{f(desc_c,trials.rt_log.sd,%.2f)}}} (raw RT M = {{{f(desc_c,trials.rt_raw.mean,%.0f)}}} ms, SD = {{{f(desc_c,trials.rt_raw.sd,%.0f)}}} ms). Gaze bias (b) averaged {{{f(desc_c,trials.gaze_bias.mean,%.3f)}}} (SD = {{{f(desc_c,trials.gaze_bias.sd,%.3f)}}}); trials with no usable gaze comprised {{{pct(desc_c,trials.gaze_bias.prop_no_gaze,%.1f%%)}}}.
+
+Pairwise correlations among the focal predictors were modest ($\text{max} |r| =$ {{{f(desc_c,correlations.diff.max_abs_r,%.2f)}}}), indicating limited collinearity for the main analyses. A detailed summary of distributions and correlations is reported in Appendix ref:sec:supplementary-results. 
+
+** Possible Additional Results to Report Beyond the Three Main Analyses :noexport:
+:PROPERTIES:
+:CUSTOM_ID: summary-of-psi-and-problem-solving-results
+:END:
+- Sample and data quality
+  - Recruitment, exclusions, final N, number of trials retained; pass rates on catch trials; compliance with pre-registration.
+  - Webcam eye-tracking quality: distribution of calibration categories (excellent/solid/etc.), median tracking ratio, spatial error estimate, proportion of usable gaze samples per participant/trial.
+  - Reaction-time preprocessing: trimming, outlier handling, RT distribution (pre/post log-transform).
+
+- Descriptive characteristics of stimuli and metrics
+  - Distributions of the three complexity metrics and diagonal dissimilarity (per solution), and of between-solution differences used in evaluation trials.
+  - Correlations among complexity metrics and diagonal dissimilarity; VIFs for multicollinearity.
+  - Stimulus sampling balance: counts by problem difficulty and problem size; number of optimal solutions per problem instance; proportion of instances where the greedy solution was optimal; distribution of heuristic optimality.
+
+- Manipulation and coherence checks
+  - Coherence-trial performance (already included): add exact pattern counts and by-participant consistency indices; test–retest split-half of coherence if applicable.
+  - Choice-strength analysis: relation between absolute complexity difference and "definitely" vs "slightly" choices (e.g., ordinal threshold spacing interpretation or post hoc logistic comparing "definitely" vs others).
+
+- Individual differences and moderators
+  - Descriptives for PSI and problem-solving efficiency (PSE); correlation between PSI and PSE.
+  - Cross-level interactions or subgroup analyses not selected by AIC: report null/weak moderators (PSI, efficiency, problem difficulty, maximum disorder) in brief robustness table.
+  - Strategy–behavior link: categorical coding (from free text) versus choice effects (e.g., participants endorsing greedy strategies show larger heuristic-alignment effect).
+
+- Model diagnostics and robustness
+  - Ordinal model diagnostics: proportional-odds sensitivity (fit probit/cloglog links; results stable?), residual checks, random-effects SDs, ICC, marginal/conditional $R^2$ (reported), and influence diagnostics (leave-one-participant-out).
+  - Alternative specifications: exclude diagonal dissimilarity; include only one complexity metric at a time; results consistent?
+  - Equivalence/precision for null RT and gaze results: SESOI + TOST or Bayes factors to support "no effect" claims; power/sensitivity analysis for plausible effect sizes.
+
+- Learning, order, and fatigue
+  - Trial-order effects on choice, RT, and gaze; practice vs later trials; does the complexity effect strengthen/attenuate over time?
+  - Time-on-task trends in RT and gaze quality.
+
+- Problem-solving block outcomes
+  - Performance across the 7 problem-solving trials: accuracy (optimality rate), time, learning curve; relationship to later evaluation choices.
+  - Whether exposure to optimal solutions in feedback affected subsequent preferences (e.g., stronger heuristic/visual-order effects after feedback).
+
+Further descriptive results, including additional figures and data tables, can be found in Appendix ref:sec:descriptives.
+
+* Discussion
+:PROPERTIES:
+:CUSTOM_ID: discussion
+:END:
+
+In this paper, we asked which properties of equally optimal packing solutions make them easier to understand. We showed two optimal solutions to the same problem side by side and collected a graded, four-option preference. Participants' choices consistently favored the solution with lower complexity along three predefined metrics --- /compositional complexity/ (CC), /visual-order complexity/ (VC), and /heuristic-related complexity/ (HC). Reaction times showed selective facilitation for larger heuristic-related differences, and aggregate webcam-based gaze did not exhibit complexity-driven dwell asymmetries. Together, these findings support a feature-based account of interpretability in optimal packing solutions and suggest practical ways to present machine-generated solutions so they align with human cognitive expectations.
+
+** Interpretable Structure: Alignment with Human Heuristics and Perceptual Organization
+
+Our results supported the main hypothesis: all three complexity differences were negative predictors of choice, indicating reliable preference for simpler solutions. These convergent effects fit a simple cognitive story. First, compositional simplicity reduces encoding demands: extreme fills (near-empty or near-full) provide summary cues that minimize working-memory load [cite/p:@swellerCognitiveLoadProblem1988]. Second, visual order helps the perceptual system produce short, rule-like descriptions (e.g., "largest first"; "bins/items are sorted"), consistent with simplicity/likelihood principles in everyday perception [cite/p:@feldmanSimplicityPrinciplePerception2016; @vanderhelmSimplicityLikelihoodVisual2000]. Third, heuristic alignment enables immediate rationalization of how a solution was constructed, reducing explanatory burden [cite/p:@gigerenzerHeuristicDecisionMaking2011].
+
+
+Notably, the robust effect of HC indicates that participants apply familiar heuristics even when evaluating completed solutions, not only when generating them. This observation extends the heuristic literature (which has largely focused on solution construction; [cite//bare:@gigerenzerHeuristicDecisionMaking2011; @cormenIntroductionAlgorithms2009]) to the evaluation of precomputed solutions. It also parallels findings from discrimination paradigms using Euclidean Traveling Salesman Problem solutions, where simple geometric cues (e.g., absence of crossings, shorter edges, hull adherence) guide judgments about which tour is better [cite/p:@kyritsisPerceivedOptimalityCompeting2022]. Our results show that alignment with a greedy packing heuristic systematically shifts interpretability preferences among equally optimal solutions. Framing evaluative judgments as heuristic use helps explain why solutions that align more closely with our reference greedy heuristic (lower HC) are easier to understand, and why larger between-solution differences in that alignment are associated with faster decisions.
+
+Practical levers follow directly from these findings. For presentation, reduce VC by sorting bins and items, reducing perceptual disorder. For optimization, incorporate interpretability as a secondary criterion so solvers prefer solutions with lower CC and lower HC among equal-value optima --- e.g., breaking ties by preferring lower CC/HC, adding small penalties to complexity in multi-objective formulations [cite/p:@ehrgottMulticriteriaOptimization2005], or screening a shortlist of optimal solutions and presenting the most interpretable. This integrates interpretability without sacrificing objective value and aligns with explainable planning practices [cite/p:@foxExplainablePlanning2017; @chakrabortiPlanExplanationsModel2017; @barredoarrietaExplainableArtificialIntelligence2020; @rudinStopExplainingBlack2019].
+
+
+** Reaction Times: Small, Selective Effects
+
+Larger heuristic differences ($|\Delta\text{HC}|$) were associated with modestly faster evaluations, consistent with our second hypotheses and the idea that familiar construction reduces decisional conflict [cite/p:@gigerenzerHeuristicDecisionMaking2011; @swellerCognitiveLoadProblem1988]. In contrast, ($|\Delta\text{CC}|$) and ($|\Delta\text{VC}|$) did not reliably shorten decisions, suggesting these cues guide preference without necessarily compressing total deliberation in our low-pressure setting. The exploratory sample showed broader RT reductions, so the selective HC pattern here likely depends on stimulus distributions, time pressure, and cohort differences rather than indicating a strong universal speed effect [cite/p:@luceResponseTimesTheir1986].
+
+** Null Gaze Results Under Webcam Tracking
+
+We hypothesized that complexity differences would manifest in attentional asymmetry; however, aggregate side-wise dwell did not vary with complexity under webcam-based tracking, and the retained intercept suggested a modest left-gaze tendency. Coarse spatial precision and our focus on aggregate dwell (rather than scanpaths or first fixations) likely reduced sensitivity to subtle attentional dynamics [cite/p:@papoutsakiWebgazerScalableWebcam2016]. In paired presentations of equally optimal alternatives, brief or small asymmetries may be swamped by inter-trial variability. Laboratory eye tracking with higher precision, pupillometry (load), and scanpath analyses would better test whether early attention tracks the same structural cues that drive choices [cite/p:@ecksteinEyeGazeWhat2017; @gollanGazeQuantifyingConscious2025].
+
+** Limitations
+:PROPERTIES:
+:CUSTOM_ID: limitations
+:END:
+
+First, construct validity is a concern. We measured interpretability with a single question ("Which of the two solutions do you find easier to understand?"), and our conclusions depend on how participants understood this prompt and on the strategies they used to decide. Metrics like CC and VC index structural cues that we assume facilitate understanding. However, participants may have used these cues directly --- selecting solutions with neat order or exact fills because they were appealing --- without deeper comprehension [cite/p:@feldmanSimplicityPrinciplePerception2016; @vanderhelmSimplicityLikelihoodVisual2000]. Such cue-driven choices could conflate "easier" with "better," reducing construct specificity. Notably, the consistent influence of HC partly mitigates this concern, as favoring heuristic-aligned solutions implies some engagement with a solution beyond surface layout. A stronger test would complement preference with performance-based tasks that require using or completing partially completed solutions.
+
+Second, ecological validity was constrained. Participants judged completed optimal solutions under unlimited time. Real deployments often involve partial solutions, constraints, risk, and deadlines; interpretability may then interact with accountability and trust [cite/p:@leeTrustAutomationDesigning2004; @dietvorstAlgorithmAversionPeople2015]. Third, we examined relatively small instances (4–6 bins, 7–9 items). Larger, more complex problems may amplify or shift which cues dominate interpretability. Fourth, our heuristic-related complexity (HC) metric instantiated a single greedy strategy (largest-bin, largest-item first); other human-plausible heuristics (e.g., best-fit decreasing; [cite//bare:@johnsonWorstcasePerformanceBounds1974;@coffmanApproximationAlgorithmsBin1997;@kellererKnapsackProblems2004]) may yield additional or alternative alignment signals. Finally, webcam-based gaze measurement limited spatial precision and precluded scanpath-level analyses.
+
+** Future Directions
+
+Beyond preference judgments, we propose a process-level paradigm in which participants are shown partially completed solutions and asked to complete them. In this setup, interpretability is operationalized by completion performance --- accuracy and time --- providing task-based indices of how usable a solution is. Combining this paradigm with laboratory eye tracking and pupillometry would offer richer insights into early attention and cognitive load dynamics related to HC, CC, and VC, and embedding time pressure and hard constraints would improve ecological validity [cite/p:@ecksteinEyeGazeWhat2017; @gollanGazeQuantifyingConscious2025].
+
+Robust measurement and generalization are also crucial. This involves developing questionnaires for perceived interpretability, cognitive load, and satisfaction to complement choice data [cite/p:@afsarDesigningEmpiricalExperiments2023; @doshi-velezRigorousScienceInterpretable2017; @narayananHowHumansUnderstand2018]. Generalization to other packing and knapsack variants, as well as larger instances, also needs to be assessed [cite/p:@kellererKnapsackProblems2004; @cacchianiKnapsackProblemsOverview2022; @gurskiKnapsackProblemsParameterized2019].
+
+Directly examining heuristics and presentation is also vital. This includes testing multiple human-plausible heuristics when computing HC and comparing stepwise derivations (replay or interactive reveal) to static final solutions to test whether showing the construction improves understanding specifically for heuristic-aligned solutions [cite/p:@foxExplainablePlanning2017; @chakrabortiPlanExplanationsModel2017; @tverskyAnimationCanIt2002]. Personalizing formatting based on user-specific preferences (e.g., habitual heuristics) and assessing whether alignment improves performance and trust also represents a promising direction [cite/p:@millerExplanationArtificialIntelligence2019; @zerilliHowTransparencyModulates2022].
+
+Future work should also quantify interpretability–optimality trade-offs, for instance, by introducing suboptimal solutions or through multi-objective formulations that include interpretability terms. This would help identify when people prefer simpler, objectively worse solutions and map decision regions where interpretability outweighs strict optimality [cite/p:@ehrgottMulticriteriaOptimization2005; @rudinStopExplainingBlack2019; @barredoarrietaExplainableArtificialIntelligence2020].
+
+A longer-term goal is a unified cognitive model that explains choices, response times, and attention from shared latent constructs. This would involve embedding HC, CC, and VC in probabilistic utility or evidence-accumulation models with participant-level parameters, and validating these models via out-of-sample prediction and process measures (gaze, pupil) [cite/p:@luceResponseTimesTheir1986; @ecksteinEyeGazeWhat2017; @francoGenericPropertiesComputational2021; @francoTaskindependentMetricsComputational2022; @feldmanSimplicityPrinciplePerception2016].
+
+
+** Conclusion
+
+Human interpretability of optimal packing solutions is reliably governed by three structural properties: lower compositional complexity, greater visual order, and alignment with a familiar greedy heuristic. These cues shift preferences substantially --- on the order of {{{pct(choice_c,coefs.diff_cc_v2_RvL_opt_z.exp_pct_abs,%.0f%%)}}} (CC), {{{pct(choice_c,coefs.diff_disorder_RvL_z.exp_pct_abs,%.0f%%)}}} (VC), and {{{pct(choice_c,coefs.diff_ac_RvL_z.exp_pct_abs,%.0f%%)}}} (HC) changes in odds per SD --- while requiring no compromise of optimality. Designing optimization outputs and interfaces to foreground these properties offers a practical path toward interpretable planning and more effective human–algorithm collaboration in real resource allocation and design tasks.
+
+
+* Data Availability Statement
+:PROPERTIES:
+:CUSTOM_ID: data-availability-statement
+:END:
+The code, materials, and data used in this research are publicly available at the Open Science Framework (OSF) repository. All shared data have been de-identified to protect participant privacy, with direct identifiers removed and indirect identifiers minimized. Eye-tracking data consist solely of numerical measurements (gaze coordinates, fixation durations, timestamps, and related metrics); no video recordings of participants were collected or stored during the study. You can access them at the following link: https://osf.io/4wjgp/.
+
+* CRediT Authorship Contribution Statement
+:PROPERTIES:
+:CUSTOM_ID: credit-authorship-contribution-statement
+:END:
+DP: Conceptualization, Investigation, Methodology, Software, Formal Analysis, Data Curation, Visualization, Writing - Original Draft, Writing - Review & Editing. FJ: Methodology, Writing - Review & Editing. DS: Writing - Review & Editing. FS: Resources, Supervision, Writing - Review & Editing. FM: Supervision, Conceptualization, Investigation, Methodology, Software, Writing - Original Draft, Writing - Review & Editing.
+
+* Acknowledgments
+:PROPERTIES:
+:CUSTOM_ID: acknowledgments
+:END:
+We would like to thank Rita Hansl, Alex Karner, Kathrin Kostorz, Cindy Lor, Daniel Reiter, Annika Trapple, Nicole Wimmer, and Mengfan Zhang for their contributions during the development of the web-based experiment.
+
+* Competing Interests
+:PROPERTIES:
+:CUSTOM_ID: competing-interests
+:END:
+The authors declare no competing interests.
+
+* Funding
+:PROPERTIES:
+:CUSTOM_ID: funding
+:END:
+# This work was supported by grant FA471030 from the Austrian Research Promotion Agency (German: Österreichische Forschungsförderungsgesellschaft, FFG).
+
+This research was funded by the Austrian Research Promotion Agency (FFG), Project Nos. 471030, 887474 & 927913. FM was funded by the Austrian Science Fund (FWF) [10.55776/ESP133]. 
+
+#+latex: \FloatBarrier
+* References
+:PROPERTIES:
+:CUSTOM_ID: references
+:END:
+
+
+#+LaTeX: \printbibliography[heading=none]
+
+#+latex: \clearpage
+
+* Appendix                                                           :ignore:
+#+LATEX: \appendix
+
+** Supplementary Methods
+<<sec:supplementary-methods>>
+*** Model Comparison
+:PROPERTIES:
+:CUSTOM_ID: appendix-c-model-comparison
+:END:
+<<sec:model-comparison>>
+**** General conventions
+:PROPERTIES:
+:CUSTOM_ID: c.0-general-conventions
+:END:
+- Software and estimation: ~clmm~ (~thresholds = "symmetric"~, ~link = "logit"~, Laplace); ~lmer~ with ~REML = FALSE~. All predictors z-standardized across the full sample.
+
+- Candidate generation: Two-way interactions only and only between complexity predictors and moderators. No interactions among main effects. /Maximum disorder/ is never entered in a model that includes /visual-order complexity/. Predictors may enter individually; moderators enter only with their associated main effect(s).
+
+- Random effects (constant within each analysis): Participant random intercepts in all models; random slopes for the included complexity main effects (and diagonal, if present) where convergence allows. Interactions are not given random slopes. If the maximal structure fails, simplify uniformly across all candidates until convergence.
+
+- Model selection: AIC-based selection; retain the model with AIC at least 2 units lower than all competitors ($\Delta\text{AIC} > 2$). If multiple within 2 AIC units, we consider them equivalent [cite/p:@burnhamModelSelectionMultimodel2004] and choose the simplest (fewest parameters).
+
+- Coding: choice and gaze use signed right--left differences for complexity predictors (and /diagonal dissimilarity/); /RT/ uses absolute differences. Moderators are not differenced.
+
+**** Choice (Ordinal Outcome)
+:PROPERTIES:
+:CUSTOM_ID: c.1-choice-ordinal-outcome
+:END:
+- Outcome: choice (right vs left; ~clmm~).
+
+- Main effects: $\Delta\text{HC}$, $\Delta\text{CC}$, $\Delta\text{VC}$, $\Delta\text{DD}$.
+- Moderators: PD, PSI, PSE, MD, HO.
+- Interactions: $\Delta\text{HC}/\Delta\text{CC}/\Delta\text{VC} \times$ moderators.
+- Constraint: Do not include MD with $\Delta\text{VC}$.
+
+**** Reaction Time (Continuous Outcome)
+:PROPERTIES:
+:CUSTOM_ID: c.2-reaction-time-continuous-outcome
+:END:
+- Outcome: log RT (~lmer~; ~REML = FALSE~).
+- Main effects: $|\Delta\text{HC}|$, $|\Delta\text{CC}|$, $|\Delta\text{VC}|$, $|\Delta\text{DD}|$.
+- Additional covariates: PD, PSI, PSE, HO, MD.
+- No moderators/interactions
+- Constraint: Do not include MD with $|\Delta\text{VC}|$.
+
+**** Gaze Bias (Binomial Outcome)
+:PROPERTIES:
+:CUSTOM_ID: c.3-gaze-bias-binomial-outcome
+:END:
+
+- Outcome: ~cbind(R, L)~, binomial(logit), ~glmer~.
+- Main effects: $\Delta\text{HC}$, $\Delta\text{CC}$, $\Delta\text{VC}$, $\Delta\text{DD}$.
+- Moderators: PD, PSI, PSE, MD, HO.
+- Interactions: $\Delta\text{HC}/\Delta\text{CC}/\Delta\text{VC} \times$ moderators.
+- Constraint: Do not include MD with $\Delta\text{VC}$.
+
+
+
+*** Stimulus and Trial Generation
+:PROPERTIES:
+:CUSTOM_ID: appendix-a-stimulus-and-trial-generation
+:END:
+<<sec:stimulus-trial-generation>>
+**** Generation of Problem and Solution Instances
+:PROPERTIES:
+:CUSTOM_ID: a.1.-generation-of-problem-and-solution-instances
+:END:
+<<sec:stimulus-generation>>
+Problem instances were generated via a simulation process consisting of 20,000 iterations. In each simulation iteration a bin‐packing problem instance was constructed by randomly determining the number of items and bins. The number of items was sampled from a discrete uniform distribution, U(7, 9), and the number of bins was sampled from U(4, 6). Item loads were drawn from a discrete uniform distribution ranging from 5 to 100 in steps of 5. Overall bin capacities were based on a load-capacity ratio sampled uniformly from [0.8, 1.0]. A custom algorithm then allocated the overall bin capacity across bins while respecting a minimal bin capacity of 10, a maximal bin capacity of 100, and steps of 10. To ensure meaningful problem instances, each instance was screened to ensure that no item load exceeded the largest bin capacity, and no bin capacity was smaller than the smallest item load.
+
+The resulting problem instance contained a vector of item loads and a corresponding vector of bin capacities. Optimal solutions for each problem instance were computed using a constraint programming satisfiability (CP-SAT) solver [cite/p:@cpsatlp]. Since the solver returned only one optimal solution by default, we iteratively added constraints to exclude previously found solutions until we obtained up to 100 distinct optimal solutions. The process stopped when either 100 solutions were found or a new solution's objective value dropped below that of the current optimal solutions.
+
+Subsequent to optimal solution identification, redundant solutions were removed, which involved checking for equivalence in bin compositions; for instance, two solutions were deemed equivalent if they contained bins with the same set of items, such as one bin comprising items of sizes 100, 90, 80, 40 and another comprising 100, 80, 90, 40, ensuring that all bins across the solutions match in content. Finally, problem instances with only one unique optimal solution were discarded to allow comparisons between multiple solutions to the same problem instance. Additional solution-specific metrics were computed, including HC and CC, both of which are described in the main text.
+
+These 20,000 simulations resulted in 13,269 problem instances after applying all filters.
+
+**** Generation of Trials
+:PROPERTIES:
+:CUSTOM_ID: a.2.-generation-of-trials
+:END:
+<<sec:trial-generation>>
+The subsequent trial-generation procedure was designed to yield trials for two distinct parts of the experiment: /problem-solving trials/ and /evaluation trials/. For the /problem-solving trials/, seven problem instances were selected using quantile sampling based on their load-capacity ratio, our metric representing /problem difficulty/ --- out of all previously generated instances. More specifically, the seven quantiles were defined at equal intervals from 0 to 1, and the corresponding problem instance was selected for each quantile. The seven resulting /problem-solving trials/ were then complemented with an arbitrary optimal solution --- the first one produced by the CP-SAT solver for each problem instance --- to provide a clear example to the participant. These seven trials only had to be created once and were used for all participants in the experiment.
+
+For each participant, an individual set of 25 /evaluation trials/ was derived from the full set of generated problem instances (and their associated solution instances). These trials were constructed by pairing solution instances within each problem instance. To ensure balanced and stratified sampling across key complexity metrics, problem instances were first categorized into difficulty levels (/low/, /medium/, /high/) based on quantiles of the load--capacity ratio. For each metric of interest (namely, absolute difference in HC and absolute difference in CC), six extremized /evaluation trials/ were obtained by selecting, for each difficulty level, two solution pairs from the top 10th percentile with respect to the metric of interest. Moreover, three random /evaluation trials/ were generated by stratifying sampling procedures according to /problem difficulty/ and problem size. Another three trials were generated by cloning the previously generated random /evaluation trials/ and applying visual manipulations (permutations of the order of items and bins): one of the three pairs received a visual manipulation on its first solution, another pair received it on its second solution, and another pair received the visual manipulation on both solutions (referred to as "duplicated random trials" in the codebase). By stratifying the sampling procedures by problem size, two additional random trials were conducted. Unlike before, each pair consisted of two identical solutions, but their visual presentation differed: the first pair received a visual manipulation of the second solution, while the second pair received a visual manipulation of the first solution (referred to as "random same trials" in the codebase). These 20 trials were sampled individually for each participant. In addition, two /catch trials/ and three /coherence trials/ were integrated into the /evaluation trials/ to assess participants' attentiveness and coherence. These five trials were the same for all participants and were only sampled once. For the former, two low-difficulty problem instances featuring identical solutions were chosen so that any preference in the experiment would indicate a lack of careful engagement with the task. To generate the /coherence trials/, we initially filtered the problem set to identify medium-level cases in terms of /problem difficulty/ that offered at least three optimal solutions, as /coherence trials/ required three distinct solutions to the same problem. To ensure diversity among solutions, we assessed each candidate problem by calculating the range of a chosen metric, /compositional complexity/, subtracting its minimum value from its maximum. Additionally, we determined an asymmetry score by evaluating the absolute difference between the median and the mean of the metric distribution. This score helps maintain a symmetric distribution of the metric values, ensuring balanced and representative solution variability. We retained problems that met or exceeded the 95th percentile for range values to ensure substantial variability in the metric. From this refined set, we selected the problem with the smallest asymmetry score. For the chosen problem, representative solutions with minimum, median, and maximum /compositional complexity/ values were selected and paired to create the final set of /coherence trials/.
+
+The entire /evaluation trial/ sequence was constructed by assigning specific trial slots to /coherence trials/ and /catch trials/ while randomly distributing the remaining /evaluation trials/. In total, the experimental design yielded seven /problem-solving trials/ and a structured set of /evaluation trials/ comprising extremized, random (with and without visual manipulation), /coherence/, and /catch trials/. This careful stratification ensured that trials were balanced with respect to solution instance complexity and /problem difficulty/, thereby minimizing potential sampling biases.
+
+*** Construction of the Approximated Diagonal Assignment Matrix
+:PROPERTIES:
+:CUSTOM_ID: appendix-d-construction-of-the-approximated-diagonal-assignment-matrix
+:END:
+<<sec:approximated-diagonal>>
+The approximated diagonal used to compute DD, which acts as a control for HC, is a purely theoretical assignment matrix that mimics a straight diagonal line; it is not intended as a realistic or optimal solution. Its sole purpose is to provide a simple geometric baseline against which to measure a solution's deviation from a diagonal pattern. Below is Python code to create this matrix:
+
+#+begin_src python -n
+def create_diagonal_matrix_approximated(n_rows, n_cols):  
+    # 1. Create an all-zero matrix M of size rows x cols.
+    M = [[0 for _ in range(n_cols)] for _ in range(n_rows)]
+    
+    # 2. For each row i = 0...rows - 1
+    for i in range(n_rows):
+        # a. col_index <- round[i * (cols - 1) / (rows - 1)]
+        col_index = round(i * (n_cols - 1) / (n_rows - 1))
+        
+        # b. Set M[i, col_index] <- 1
+        M[i][col_index] = 1
+        
+    # 3. Return M.
+    return M
+#+end_src
+
+
+\noindent The interpolation in Step 2a evenly spreads the "1" entries from the upper-left to the lower-right corner, resulting in a staircase-like diagonal when rows $\ne$ cols.
+
+*** Calibration of the Compositional-Complexity Model
+:PROPERTIES:
+:CUSTOM_ID: appendix-e-calibration-of-the-compositional-complexity-model
+:END:
+<<sec:calibration>>
+**** Calibration for Exploratory Experiment
+:PROPERTIES:
+:CUSTOM_ID: calibration-for-exploratory-experiment
+:END:
+The /compositional-complexity/ /model/ was calibrated before data collection because (a) the trial-generation procedure relied on the complexity values that this model assigned to each solution instance and (b) the ensuing mixed-effects analyses required a single, fixed complexity estimate for each stimulus. Calibration used a corpus of 145 previously obtained optimal solutions. To create a criterion for calibration, three established quality indices /assignment variance/, /average discrepancy/, and /average ratio/ --- were computed for every solution and z-standardized across the corpus. A principal-components analysis was then performed, and the first component (explaining the largest share of variance) was retained as a univariate compound score that served as the empirical benchmark. The model contains three continuous parameters (controlling the penalty for partial assignments, weighting unassigned load, and scaling the entropy term) and two categorical switches (the distribution assumed for empty assignments --- normal, Laplace, or continuous Bernoulli --- and an optional Dirichlet correction). For each of the six possible categorical settings, the three continuous parameters were fitted with bounded optimization using starting values of 0.50, 0.05, and 2.00, respectively. The loss function was the negative Pearson correlation between the model's predicted complexities and the empirical compound scores, so minimizing the loss maximized their correspondence. The parameter set that produced the highest final correlation was chosen for the /compositional-complexity/ /model/ specification and was held constant throughout the exploratory phase, including trial generation and statistical analyses. The search identified the normal empty-space with Dirichlet correction as optimal, with parameter estimates $p = 0.97722076$ (geometric), scale = 0.10278701 (normal SD), and $\alpha = 1.62018247$ (Dirichlet concentration).
+
+**** Calibration for Confirmatory Experiment
+:PROPERTIES:
+:CUSTOM_ID: calibration-for-confirmatory-experiment
+:END:
+The /compositional-complexity/ /model/ was re-tuned after the exploratory phase because (a) the trial-generation procedure relied on the complexity values that this model assigned to each solution instance and (b) using it as a predictor in the mixed-effects analyses required a single, fixed parameter specification. Calibration relied on the right-versus-left preferences expressed in the exploratory sample (n = {{{n(demo_e,counts.N_included)}}} participants, 1,664 trials). For every trial the model produced a complexity estimate for each of the two alternative solutions; their difference served as the sole predictor of the ordinal choice variable (/definitely left/, /slightly left/, /slightly right/, /definitely right/). As in the exploratory calibration, three continuous parameters were optimized; the geometric penalty for partial assignments, the weight given to unassigned load, and the scaling factor on the entropy term. Two categorical switches were again crossed: the distribution assumed for empty assignments (normal, Laplace, or continuous Bernoulli) and the optional Dirichlet correction, yielding six discrete model variants. For each variant the three continuous parameters were fitted with bounded optimization using starting values of 0.50, 0.05, and 2.00, respectively. The loss function was the ordinal log-loss between the four-level observed choices and the probabilities implied by the model; minimizing this quantity maximized predictive accuracy. The search identified the continuous Bernoulli empty-space with Dirichlet correction as optimal, with parameter estimates $p = 0.04283524$ (geometric), scale = 0.42639725 (continuous Bernoulli SD), and $\alpha = 0.98438935$ (Dirichlet concentration), achieving a log-loss of 1.3501. This configuration was used to generate the final trial set and was held fixed for all subsequent analyses.
+
+** Supplementary Results
+<<sec:supplementary-results>>
+
+Proportion of coherent participants was {{{f(coherence_c,p_coherent,%.3f)}}}. Pattern counts across coherence trials: transitive = {{{f(coherence_c,n_transitive,%d)}}}, intransitive = {{{f(coherence_c,n_intransitive,%d)}}}. 
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=\linewidth]{~/Dropbox/data_export/joptim-analysis/pub/confirmatory/descriptives/fig_dv.pdf}
+  \caption{\label{fig:dv} Behavioral Distributions Of Dependent Variables}
+\par\footnotesize\textit{Note}. Histograms show the distributions of the three dependent variables across evaluation trials: choice (four ordered categories), log reaction time ($\log\,\mathrm{RT}$), and gaze bias $b=(R-L)/(R+L)$. 
+\end{figure}
+#+end_export
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/confirmatory/descriptives/fig_scatter_matrix_signed.pdf}
+  \caption{\label{fig:scatter-matrix-signed} Scatter Matrix of Solution-Pair-Level Predictors for Choice and Gaze}
+\par\footnotesize\textit{Note}. Signed z-scored differences used in the choice/gaze analyses ($\Delta$HC, $\Delta$CC, $\Delta$VC, $\Delta$DD) and Maximum Disorder (MD). Upper triangles show Pearson's $r$; diagonals show distributions (mean in red, standard deviations dashed).
+\end{figure}
+#+end_export
+
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/confirmatory/descriptives/fig_scatter_matrix_abs.pdf}
+  \caption{\label{fig:scatter-matrix-abs} Scatter Matrix of Solution-Pair-Level Predictors for Reaction Time}
+\par\footnotesize\textit{Note}. Absolute z-scored differences used in the RT analysis ($|\Delta|$HC, $|\Delta|$CC, $|\Delta|$VC, $|\Delta|$DD) and Maximum Disorder (MD). Upper triangles show Pearson's $r$; diagonals show distributions (mean in red, standard deviations dashed).
+\end{figure}
+#+end_export
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{~/Dropbox/data_export/joptim-analysis/pub/confirmatory/descriptives/fig_corr_participant.pdf}
+  \caption{\label{fig:corr-participant} Participant-Level Variables}
+\par\footnotesize\textit{Note}. Distributions and correlation (Pearson) for participant-level moderators (PSI total, problem-solving efficiency). Summary statistics are reported in the text; figures document ranges and association strength used in moderation analyses.
+\end{figure}
+#+end_export
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{~/Dropbox/data_export/joptim-analysis/pub/confirmatory/descriptives/fig_corr_problem.pdf}
+  \caption{\label{fig:corr-problem} Problem-Level Variables}
+\par\footnotesize\textit{Note}. Distributions and correlation (Pearson) for problem-level moderators (difficulty: load–capacity ratio; heuristic optimality). Shown for transparency regarding range and potential confounding in moderation tests.
+\end{figure}
+#+end_export
+
+# Calibration quality: excellent {{{pct(desc_c,calibration.quality_props.excellent,%.1f%%)}}}, solid {{{pct(desc_c,calibration.quality_props.solid,%.1f%%)}}}, average {{{pct(desc_c,calibration.quality_props.average,%.1f%%)}}}, below average {{{pct(desc_c,calibration.quality_props.below_average,%.1f%%)}}}, poor {{{pct(desc_c,calibration.quality_props.poor,%.1f%%)}}}.
+** Exploratory Study
+:PROPERTIES:
+:CUSTOM_ID: appendix-b-exploratory-study
+:END:
+<<sec:exploratory-study>>
+*** Participants
+:PROPERTIES:
+:CUSTOM_ID: b.1.-participants
+:END:
+Given the novel paradigm examined in this study, a sequential data collection approach was employed to iteratively assess outcomes and refine sample size. Initial recruitment included 3 participants to conduct a preliminary review of the study procedure and address any immediate methodological concerns. After verifying feasibility, subsequent cohorts included 6, 12, 24, 36, and 36 participants, ultimately arriving at a total sample size of {{{n(demo_e,counts.N_completed)}}}. This stepwise increase allowed for ongoing evaluation of data variability and early detection of potential effects. The final sample size was determined based on the saturation of key findings observed, with an emphasis on capturing diverse participant responses to enhance the robustness of exploratory insights. This approach was instrumental in maintaining flexibility and optimizing resource utilization throughout the study.
+
+A total of {{{n(demo_e,counts.N_completed)}}} participants recruited from Prolific completed the study, with {{{n(demo_e,counts.N_included)}}} participants and 1,664 /evaluation trials/ remaining after outlier exclusion. Ages ranged from {{{n(demo_e,age.min)}}} to {{{n(demo_e,age.max)}}} years (M = {{{f(demo_e,age.mean,%.2f)}}}, SD = {{{f(demo_e,age.sd,%.2f)}}}), and the sample consisted of {{{pct(demo_e,sex.prop.male,%.2f%%)}}} male and {{{pct(demo_e,sex.prop.female,%.2f%%)}}} female. Participants predominantly identified as White ({{{pct(demo_e,ethnicity.prop.white,%.2f%%)}}}), with other ethnicities also represented. The majority resided in the UK ({{{pct(demo_e,residence.prop.uk,%.2f%%)}}}), with the remainder living in the US ({{{pct(demo_e,residence.prop.us,%.2f%%)}}}). All were fluent in English ({{{pct(demo_e,language.prop.english,%.2f%%)}}}). Education levels varied: {{{pct(demo_e,education_highest.prop.secondary,%.2f%%)}}} completed secondary education, {{{pct(demo_e,education_highest.prop.high_school,%.2f%%)}}} earned a high school diploma or A-levels, another {{{pct(demo_e,education_highest.prop.technical_college,%.2f%%)}}} completed technical or community college, while {{{pct(demo_e,education_highest.prop.undergrad,%.2f%%)}}} held undergraduate degrees, {{{pct(demo_e,education_highest.prop.graduate,%.2f%%)}}} had graduate degrees, and {{{pct(demo_e,education_highest.prop.doctorate,%.2f%%)}}} achieved a doctorate; {{{pct(demo_e,education_highest.prop.no_qualifications,%.2f%%)}}} had no formal qualifications. Employment status showed {{{pct(demo_e,employment_status.prop.full_time,%.2f%%)}}} in full-time work. Most participants were right-handed ({{{pct(demo_e,handedness.prop.right,%.2f%%)}}}), with some left-handed ({{{pct(demo_e,handedness.prop.left,%.2f%%)}}}) and ambidextrous ({{{pct(demo_e,handedness.prop.ambidextrous,%.2f%%)}}}). Participants took an average of {{{f(demo_e,time_taken.mean,%.2f)}}} minutes to complete the experiment (SD = {{{f(demo_e,time_taken.sd,%.2f)}}}).
+*** Parameters for Compositional Complexity (CC)
+
+Prior to each experiment (exploratory or confirmatory), a dedicated fitting procedure was conducted to determine these parameters (see Appendix ref:sec:calibration for details). 
+For our exploratory analysis, this procedure yielded the following parameters: {{{s(desc_e,cc_params.empty_dist)}}} distribution for empty space {{{s(desc_e,cc_params.dirichlet_corr)}}} Dirichlet correction, scale parameter $\sigma=$ {{{f(desc_e,cc_params.empty_param,%.3f)}}}, $p=$ {{{f(desc_e,cc_params.geom_p,%.3f)}}} and $\alpha=$ {{{f(desc_e,cc_params.comp_alpha,%.3f)}}}.
+
+
+- Item count ($N$): strong preference for small $N$ (high $p$ concentrates mass at $N = 0–1$), so bins with many items incur high surprise.
+- Empty space ($E$): sharp concentration at extremes (small $\sigma$), strongly penalizing mid-fill compared to near-empty or near-full bins.
+- Composition ($C$): preference for evenly split loads ($\alpha > 1$ with correction), penalizing highly uneven within-bin splits.
+
+Thus, in the exploratory study CC primarily penalized many-item bins and mid-fill, and favored even compositions.
+
+*** Results
+:PROPERTIES:
+:CUSTOM_ID: b.2.-results
+:END:
+**** Choice
+:PROPERTIES:
+:CUSTOM_ID: choice
+:END:
+
+All four predictors were significant negative predictors of the ordered outcome; a $1-\text{SD}$ increase reduced the odds of a higher category by {{{rpct(choice_e,coefs.diff_cc_v2_RvL_z.exp_pct_abs,coefs.diff_disorder_RvL_z.exp_pct_abs,%.0f%%)}}} (strongest for /visual-order complexity/), with substantial between-participant variability (Table ref:tab:choice-exploratory). Figure ref:fig:choice-probabilities-exploratory illustrates how differences in stimulus complexity are reflected in participants' choice behaviour. The conditional Nakagawa $R^2$ of {{{f(choice_e,r2.cond,%.2f)}}} indicates that the model's fixed and random effects explain about {{{pct(choice_e,r2.cond,%.0f%%)}}} of the variance in the data, while the marginal Nakagawa $R^2$ of {{{f(choice_e,r2.marg,%.2f)}}} shows that the fixed effects alone account for approximately {{{pct(choice_e,r2.marg,%.0f%%)}}}. This value is well below the coherence ceiling of {{{f(coherence_e,p_coherent,%.3f)}}}, derived from the {{{pct(coherence_e,p_coherent,%.2f%%)}}} of participants who demonstrated transitive judgments in the /coherence trials/, suggesting that a substantial portion of the decision variance may be random rather than systematic.
+
+#+INCLUDE: "~/Dropbox/data_export/joptim-analysis/pub/exploratory/mlm_choice/tab_choice.tex" src latex
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=1.0\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/exploratory/mlm_choice/fig_choice_probability_panels.pdf}
+  \caption{\label{fig:choice-probabilities-exploratory} Predicted Choice Probabilities as a Function of Complexity Difference (Exploratory Study)}
+\par\footnotesize\textit{Note}. Panels correspond to the three complexity metrics (HC = heuristic-related complexity, CC = compositional complexity, VC = visual-order complexity) and the covariate diagonal dissimilarity (DD). Colored lines give the model-predicted probability of the four behavioral responses (‘definitely left', ‘slightly left', ‘slightly right', ‘definitely right'); shaded ribbons denote 95\% confidence intervals (CIs).\end{figure}
+#+end_export
+
+**** Reaction Time
+:PROPERTIES:
+:CUSTOM_ID: response-time
+:END:
+
+ Larger absolute differences in HC, CC, and VC sped up choices, whereas the DD covariate had no reliable impact on reaction time (see Table ref:tab:rt-exploratory). The model's marginal $R^2$ was {{{f(rt_e,r2.marg,%.3f)}}}, and the conditional $R^2$ was {{{f(rt_e,r2.cond,%.3f)}}}, indicating modest variance explained by fixed effects with substantial additional variance captured by random participant differences.
+
+
+#+INCLUDE: "~/Dropbox/data_export/joptim-analysis/pub/exploratory/mlm_rt/tab_rt.tex" src latex
+
+**** Gaze Bias
+:PROPERTIES:
+:CUSTOM_ID: gaze-dwell-time
+:END:
+
+Based on the AIC-based model selection procedure, the intercept-only model was selected as the most parsimonious model. The intercept was {{{f(gaze_e,coefs.(Intercept).estimate,%.3f)}}} (SE = {{{f(gaze_e,coefs.(Intercept).std_error,%.3f)}}}, 95% CI [{{{f(gaze_e,coefs.(Intercept).conf_low,%.3f)}}}, {{{f(gaze_e,coefs.(Intercept).conf_high,%.3f)}}}], $p=$ {{{p(gaze_e,coefs.(Intercept).p_value)}}}). Model fit indices were low (marginal $R^2 =$ {{{f(gaze_e,r2.marg,%.3f)}}}; conditional $R^2 =$ {{{f(gaze_e,r2.cond,%.3f)}}}), consistent with the intercept-only result and the absence of reliable complexity effects on side-wise dwell. The analysis was based on {{{n(gaze_e,n_obs)}}} observations from {{{n(gaze_e,n_participants)}}} participants. This indicates no evidence that between-solution right-left differences in complexity or DD affected gaze in the exploratory study. 
+# intercept-only model -> no table -> comment out
+# (see Table ref:tab:gaze-exploratory).
+
+# +INCLUDE: "~/Dropbox/data_export/joptim-analysis/pub/exploratory/mlm_gaze/tab_gaze.tex" src latex
+
+**** Behavioral Distributions and Correlations Between Predictors
+Choice proportions were: definitely left {{{pct(desc_e,trials.choice_props.def_left,%.1f%%)}}}, slightly left {{{pct(desc_e,trials.choice_props.sl_left,%.1f%%)}}}, slightly right {{{pct(desc_e,trials.choice_props.sl_right,%.1f%%)}}}, definitely right {{{pct(desc_e,trials.choice_props.def_right,%.1f%%)}}}. The log reaction time had M = {{{f(desc_e,trials.rt_log.mean,%.2f)}}} and SD = {{{f(desc_e,trials.rt_log.sd,%.2f)}}} (raw RT M = {{{f(desc_e,trials.rt_raw.mean,%.0f)}}} ms, SD = {{{f(desc_e,trials.rt_raw.sd,%.0f)}}} ms). Gaze bias (b) averaged {{{f(desc_e,trials.gaze_bias.mean,%.3f)}}} (SD = {{{f(desc_e,trials.gaze_bias.sd,%.3f)}}}); trials with no usable gaze comprised {{{pct(desc_e,trials.gaze_bias.prop_no_gaze,%.1f%%)}}}."
+
+Correlations among signed differences (max |r| = {{{f(desc_e,correlations.diff.max_abs_r,%.2f)}}}).
+
+**** Descriptives
+
+
+
+Proportion of coherent participants was {{{f(coherence_e,p_coherent,%.3f)}}}. Pattern counts across coherence trials: transitive = {{{f(coherence_e,n_transitive,%d)}}}, intransitive = {{{f(coherence_e,n_intransitive,%d)}}}.
+
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=\linewidth]{~/Dropbox/data_export/joptim-analysis/pub/exploratory/descriptives/fig_dv.pdf}
+  \caption{\label{fig:dv-e} Behavioral Distributions Of Dependent Variables (Exploratory Study)}
+\par\footnotesize\textit{Note}. Histograms show the distributions of the three dependent variables across evaluation trials: choice (four ordered categories), log reaction time ($\log\,\mathrm{RT}$), and gaze bias $b=(R-L)/(R+L)$. 
+\end{figure}
+#+end_export
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/exploratory/descriptives/fig_scatter_matrix_signed.pdf}
+  \caption{\label{fig:scatter-matrix-signed-e} Scatter Matrix of Solution-Pair-Level Predictors for Choice and Gaze (Exploratory Study)}
+\par\footnotesize\textit{Note}. Signed z-scored differences used in the choice/gaze analyses ($\Delta$HC, $\Delta$CC, $\Delta$VC, $\Delta$DD) and Maximum Disorder (MD). Upper triangles show Pearson's $r$; diagonals show distributions (mean in red, standard deviations dashed).
+\end{figure}
+#+end_export
+
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering \includegraphics[width=\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/exploratory/descriptives/fig_scatter_matrix_abs.pdf}
+  \caption{\label{fig:scatter-matrix-abs-e} Scatter Matrix of Solution-Pair-Level Predictors for Reaction Time (Exploratory Study)}
+\par\footnotesize\textit{Note}. Absolute z-scored differences used in the RT analysis ($|\Delta|$HC, $|\Delta|$CC, $|\Delta|$VC, $|\Delta|$DD) and Maximum Disorder (MD). Upper triangles show Pearson's $r$; diagonals show distributions (mean in red, standard deviations dashed).
+\end{figure}
+#+end_export
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{~/Dropbox/data_export/joptim-analysis/pub/exploratory/descriptives/fig_corr_participant.pdf}
+  \caption{\label{fig:corr-participant-e} Participant-Level Variables (Exploratory Study)}
+\par\footnotesize\textit{Note}. Distributions and correlation (Pearson) for participant-level moderators (PSI total, problem-solving efficiency). Summary statistics are reported in the text; figures document ranges and association strength used in moderation analyses.
+\end{figure}
+#+end_export
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{~/Dropbox/data_export/joptim-analysis/pub/exploratory/descriptives/fig_corr_problem.pdf}
+  \caption{\label{fig:corr-problem-e} Problem-Level Variables (Exploratory Study)}
+\par\footnotesize\textit{Note}. Distributions and correlation (Pearson) for problem-level moderators (difficulty: load–capacity ratio; heuristic optimality). Shown for transparency regarding range and potential confounding in moderation tests.
+\end{figure}
+#+end_export
+
+
+
+# Calibration quality: excellent {{{pct(desc_e,calibration.quality_props.excellent,%.1f%%)}}}, solid {{{pct(desc_e,calibration.quality_props.solid,%.1f%%)}}}, average {{{pct(desc_e,calibration.quality_props.average,%.1f%%)}}}, below average {{{pct(desc_e,calibration.quality_props.below_average,%.1f%%)}}}, poor {{{pct(desc_e,calibration.quality_props.poor,%.1f%%)}}}.
+
+** Cross-Study Summaries (Forest Plots) 
+<<sec:cross-study-summary>>
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering\includegraphics[width=\linewidth]{~/Dropbox/data_export/joptim-analysis/pub/extended/fig_extended_forest_choice.pdf}
+  \caption{Cross-study odds ratios (ORs) with 95\% CIs for the effect of complexity difference on choice (HC, CC, VC, DD). Points show models fit separately to exploratory and confirmatory data; the dashed line marks OR = 1.}
+\end{figure}
+#+end_export
+
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering\includegraphics[width=\linewidth]{~/Dropbox/data_export/joptim-analysis/pub/extended/fig_extended_forest_rt.pdf}
+  \caption{Percent change in reaction time per 1-SD absolute difference (|$\Delta$|) in HC, CC, VC, DD, with 95\% CIs, across exploratory and confirmatory studies. The dashed line marks 0\%.}
+\end{figure}
+#+end_export
+
+
+
+** Summary of Participant Problem-Solving and Evaluation Strategies
+:PROPERTIES:
+:CUSTOM_ID: appendix-f-summary-of-participant-problem-solving-and-evaluation-strategies
+:END:
+<<sec:participant-strategies>>
+
+*** Exploratory Study
+
+**** Problem-Solving Strategies Summarized by GPT4o
+:PROPERTIES:
+:CUSTOM_ID: problem-solving-strategies-e
+:END:
+
+***** Executive Summary
+:PROPERTIES:
+:CUSTOM_ID: executive-summary
+:END:
+Participants employed a variety of strategies to solve the packing problems, with approaches broadly categorized into mathematical calculations, priority-based filling, trial and error, and intuitive matching. These strategies evolved as participants received feedback, demonstrating adaptation and refinement over time.
+
+***** Main Strategy Categories
+:PROPERTIES:
+:CUSTOM_ID: main-strategy-categories
+:END:
+1. Mathematical Calculations:
+
+- Defined by using arithmetic and calculations to determine the best fit for items in bins.
+
+- Key characteristics include precise computations, prioritizing sums that exactly match bin capacities.
+
+- Mentioned by approximately 30% of participants.
+
+2. [@2] Priority-Based Filling:
+
+- Involving placing the largest items first or filling bins with the highest capacity.
+
+- Approaches center around maximizing initial space usage with big items and refining placement for smaller items subsequently.
+
+- Mentioned by roughly 40% of participants.
+
+3. [@3] Trial and Error:
+
+- Participants described experimenting with different combinations until they found one that worked.
+
+- Characterized by iterative testing and adjustment rather than a fixed strategy.
+
+- Mentioned by about 25% of participants.
+
+4. [@4] Intuitive Matching:
+
+- Strategy based on instinctively matching items to bin sizes with minimal calculations.
+
+- Participants used gut feeling or visual estimation to make decisions.
+
+- Mentioned by around 15% of participants.
+
+***** Key Findings
+:PROPERTIES:
+:CUSTOM_ID: key-findings
+:END:
+- Common Patterns: Participants frequently began by targeting either the largest items or bins and then worked on optimization through combination or computational checks.
+
+- Strategy Evolution: Many participants noted improvement over trials, refining strategies based on feedback, particularly moving from trial and error to priority-based calculations.
+
+- Specific Techniques: Techniques such as "filling largest bins first," "pairing items to perfectly match bin capacity," and "combining smaller items together" were frequently cited.
+
+- Metacognitive Aspects: Numerous participants reflected on their learning process, particularly how feedback informed strategy adjustments over time.
+
+***** Notable Individual Approaches
+:PROPERTIES:
+:CUSTOM_ID: notable-individual-approaches
+:END:
+- One participant mentioned using "a strategy from dynamic programming," indicating a more structured and algorithmic approach.
+
+- Several participants reported not initially having a defined strategy but gradually developing their methods based on experience and reflection.
+
+***** Implications
+:PROPERTIES:
+:CUSTOM_ID: implications
+:END:
+The variety of strategies employed underscores the complexity of human problem-solving processes in packing scenarios, highlighting differential application of mathematical reasoning, priority-based methods, and intuitive decision-making. This indicates an adaptability and learning mechanism driven by feedback, which can be capitalized on in educational or cognitive research settings.
+
+**** Evaluation Strategies Summarized by GPT4o
+:PROPERTIES:
+:CUSTOM_ID: evaluation-strategies-e
+:END:
+***** Executive Summary
+:PROPERTIES:
+:CUSTOM_ID: executive-summary-1
+:END:
+Participants employed a variety of strategies to determine which packing solutions were easier to understand. The main themes included aligning solutions with personal strategies, prioritizing simplicity and patterns, focusing on numerical order and visualization, and using heuristic approaches. Strategy frequencies varied, with some strategies being notably more common and simpler than others. Individual differences were evident, with unique approaches highlighting diverse cognitive processes and interpretations.
+
+***** Primary Strategy Categories
+:PROPERTIES:
+:CUSTOM_ID: primary-strategy-categories
+:END:
+1. Alignment with Personal Strategy: Many participants evaluated solutions based on their alignment with strategies they would personally employ, such as going from left to right or filling the highest-capacity bins first.
+
+- Example: "I picked the solution which aligned most with how I would solve the problem."
+
+- Frequency: High; mentioned in various forms by numerous participants.
+
+2. Simplicity and Visualization: Solutions perceived as visually simpler and easier to interpret were favored. Participants mentioned preference for reduced complexity, fewer boxes, and clearer patterns.
+
+- Example: "I found the less columns that were filled the easier on the eye."
+
+- Frequency: Moderate; several participants noted this theme.
+
+3. Numerical Order and Patterns: Some participants looked for sequential or logical numerical patterns, making solutions easier to understand when items and bins followed ascending or descending order.
+
+- Example: "Looking at the order of the numbers in both axes as the ones in ascending or descending order were easier to work out."
+
+- Frequency: Moderate; observed in several responses.
+
+***** Secondary Patterns
+:PROPERTIES:
+:CUSTOM_ID: secondary-patterns
+:END:
+1. Judgment by Intuition or Gut Feeling: A subset relied on instinctual judgments rather than explicit strategies.
+
+- Example: "gut feeling"
+
+- Frequency: Lower; mentioned by a few participants.
+
+2. [@2] Specific Heuristics: Participants referenced heuristics like the greedy strategy, filling the largest bins or using local optimal tactics.
+
+- Example: "greedy strategy (a computer science theory), i.e., achieving a local optimal at each column."
+
+- Frequency: Lower; few explicit mentions.
+
+***** Individual Variations
+:PROPERTIES:
+:CUSTOM_ID: individual-variations
+:END:
+- Complexity of Approach: Some participants displayed detailed strategies considering numerical sequences and visual order, showing greater strategic sophistication.
+
+- Example: "Glancing at ALL the information on both I weighed up the importance of each factor. Also the order and neatness of the filled boxes."
+
+- Lack of Strategy: Some noted having no clear strategy, highlighting confusion or reliance on randomness.
+
+- Example: "I had no strategies at all because I'm not sure I even still understand the question."
+
+***** Criteria for "Easier to Understand"
+:PROPERTIES:
+:CUSTOM_ID: criteria-for-easier-to-understand
+:END:
+Participants often considered factors such as simplicity, alignment with personal tactics, reduced clutter, clear numerical or visual order, and visible patterns when identifying more interpretable solutions.
+
+***** Cognitive Processes
+:PROPERTIES:
+:CUSTOM_ID: cognitive-processes
+:END:
+- Decision-making patterns included heuristic approaches, personal alignment, and intuitive judgments, reflecting diverse cognitive processes and heuristics in evaluating solution interpretability.
+
+***** Implications
+:PROPERTIES:
+:CUSTOM_ID: implications-1
+:END:
+These strategies reveal that interpretation of solutions involves personal biases, simplicity preferences, and heuristic reasoning. Understanding these cognitive processes can aid in designing more intuitive and accessible problem-solving interfaces or training methods that resonate with varied user preferences and cognitive styles.
+
+*** Confirmatory Study
+**** Problem-Solving Strategies Summarized by GPT5
+:PROPERTIES:
+:CUSTOM_ID: problem-solving-strategies-c
+:END:
+***** Executive Summary  
+Participants overwhelmingly used simple, greedy heuristics: matching item sums to bin capacities and placing largest items in the largest bins first. Many reported adapting across trials, adding constraint-first reasoning (place items with limited bin options early) and iterative refinement.
+
+***** Main Strategy Categories
+- Exact-fit/Capacity Matching
+  - Definition: Aim to fill each bin exactly or as close as possible to capacity to minimize leftover.
+  - Characteristics: Search for pairs/sets that sum to bin capacity (e.g., 55+45=100); "leave as little left over as possible; fill each box to capacity before moving on.
+  - Frequency: Very common (~45–55%).
+- Largest-first Greedy
+  - Definition: Prioritize placing largest items into the largest-capacity bins first.
+  - Characteristics: "Fill the biggest ones first then go down; "highest boxes first"; use small items to fill remaining gaps.
+  - Frequency: Common (~30–40%).
+- Constraint-first (Limited Placement)
+  - Definition: Place items that can only fit in specific bins (or have few options) before others.
+  - Characteristics: "Numbers that couldn't go anywhere else first; "high value with limited boxes"; "lock" unique placements early.
+  - Frequency: Moderate (~10–15%).
+- Quantity/Score Maximization (non-specific greedy)
+  - Definition: Maximize total packed or number of boxes filled without a precise capacity-matching plan.
+  - Characteristics: "Fit as many as possible; "maximize usage/score"; accept non-full bins if more items fit overall.
+  - Frequency: Moderate (~20–25%).
+- Iterative Refinement/Verification
+  - Definition: Make an initial allocation, then re-check sums, reorganize, and adjust if suboptimal.
+  - Characteristics: "First cut then review; check spare capacity vs unallocated items; reorganize if it looks suboptimal.
+  - Frequency: Some (~8–12%).
+- Trial-and-error/Intuition/No Clear Strategy
+  - Definition: Rely on instinct, random tries, or acknowledge no explicit strategy.
+  - Characteristics: "Instinct, "no strategy," "clicked randomly then realized sizes."
+  - Frequency: Some (~15–20%).
+- Pattern/Spatial Anchoring
+  - Definition: Use visual patterns or fixed traversal orders.
+  - Characteristics: Diagonal fill, top-to-bottom/left-to-right, far-right placement, column alignment.
+  - Frequency: Low (~5–8%).
+- Math-driven Calculation
+  - Definition: Explicit arithmetic and cross-checking to construct sums and verify feasibility.
+  - Characteristics: Compute totals, cross-check sums, look for exact matches and factors (e.g., 45+55), elimination.
+  - Frequency: Some (~8–12%).
+- Feedback-driven Adaptation/Learning
+  - Definition: Strategy changes based on observing optimal solutions and prior performance.
+  - Characteristics: "Learning from previous round/other score, refining from "obvious" to more nuanced combinations.
+  - Frequency: Low–moderate (~5–10%).
+
+***** Key Findings  
+- Common patterns:
+  - Greedy local optimization dominates: exact-fit matching and largest-first are the default approaches.
+  - Constraint awareness emerges: several prioritize items with limited bin options to avoid dead ends.
+  - Gap-filling with smaller items: widely used to top off bins after placing large items.
+- Specific techniques/heuristics:
+  - Fill largest bins/items first; then use small items to fill gaps.
+  - Seek exact sums per bin (e.g., 55+45=100); start with perfect matches, then near-matches.
+  - Place "forced items (that fit only one bin) early.
+  - Left-to-right/top-to-bottom traversal; diagonal fills; align items to columns.
+  - Reorganize if the layout looks suboptimal; verify feasibility by comparing spare capacity to unallocated items.
+  - Use elimination and simple arithmetic to check combinations; group similar sizes.
+- Strategy evolution:
+  - Several moved from random/intuitive to structured matching and constraint-first after seeing feedback.
+  - Early trials focused on obvious matches and largest-first; later trials added combination search and re-checking.
+  - Some explicitly learned to consider bin capacity differences and refine via trial-and-error.
+
+***** Notable Individual Approaches  
+- "Lock unique placements early and then optimize sums; desired a "lock button" to prevent moving forced items.
+- Diagonal filling pattern initially, abandoned as complexity increased.
+- Formal feasibility check: compare spare capacity across bins to total unallocated items before revising.
+- Willingness to leave a high-value item out to enable two better-fitting combinations (prioritizing total packed over single-bin perfection).
+- Column/row optimization and far-right placement strategies suggest visual/spatial anchoring not directly tied to capacity logic.
+
+***** Implications  
+- Humans default to simple, local heuristics (exact-fits, largest-first), which are effective but can miss global optima without constraint-first reasoning.
+- Exposure to feedback encourages strategy refinement: participants incorporate forced placements and iterative checks over time.
+- Cognitive load leads to reliance on visual patterns and intuition; arithmetic scaffolding (sum hints, forced-item indicators) could improve performance.
+- Multiple optimal solutions invite flexible selection criteria; some participants consider alternative scoring rules or trade-offs, highlighting metacognitive awareness and adaptive problem solving.
+
+**** Evaluation Strategies Summarized by GPT5
+:PROPERTIES:
+:CUSTOM_ID: evaluation-strategies-c
+:END:
+
+
+***** Executive Summary
+Participants judged interpretability primarily by visual order and cognitive ease. Most preferred solutions that looked orderly (left-to-right, descending sizes), used "greedy largest-first allocations, produced exact or fuller bins, and minimized mixing (fewer dots per column, fewer additions). Many anchored judgments to how they themselves would solve the problem; a minority relied on gut/visual appeal alone. Some applied systematic checks (e.g., duplicate detection, column-by-column scans). Overall, participants used fast, low-load visual/arithmetical heuristics and familiar mental models.
+
+***** Primary Strategy Categories
+- Visual order and spatial regularity (\approx23/108, ~21%)
+  - Left-to-right filling; largest bins/items on the left; neat/"descending steps, symmetry, diagonal or uniform patterns.
+- Largest-first ("greedy) heuristic (\approx16/108, ~15%)
+  - Fill largest boxes first with biggest items; "make the most of big numbers.
+- Minimize cognitive load via simplicity (\approx11/108, ~10%)
+  - Choose the option understood fastest; more "straightforward, "obvious," or "organized."
+- Fewer combinations per bin; easy sums (\approx12/108, ~11%)
+  - Prefer single-item fills or few components; avoid many dots/colors per column; favor easy/round sums (e.g., 90 vs 95+).
+- Fullness/completeness cues (combined \approx17/108, ~16%)
+  - Exact column totals (exactly filled bars) and more full bins/fewer gaps; fewer leftover items.
+- Match to own strategy/mental simulation (\approx15/108, ~14%)
+  - Pick the solution closest to how they would have solved it; imagine their own approach and compare.
+- Duplicate detection and comparison procedure (\approx11/108, ~10%)
+  - Check if solutions are identical/re-ordered; use top bars/graphs or color patterns to detect duplicates.
+
+***** Secondary Patterns
+- Visual scanning tactics (\approx5/108): column-by-column scanning, follow the dots, check rows/columns and top bars first.
+- Gut instinct/personal preference (\approx7/108) and "no strategy/none (\approx3/108); "both equal" (\approx2/108).
+- Preferences for round numbers and chunking (\approx2/108).
+- Layout specifics: top-left bias (dots near top-left felt clearer); dislike of empties in the middle; preference for spreading items across columns vs "stacking multiple items in one bin (conflicting minority preferences).
+- Efficiency cues: fewer boxes used (rare) or faster to parse.
+
+***** Individual Variations
+- Directionality differences: many preferred left-to-right; one explicitly worked rightmost-first.
+- Representation sensitivity: a few flagged isomorphic duplicates (same assignments in different order), one noted confusion about whether re-ordered graphs counted as duplicates.
+- Divergent fullness preferences: some prioritized exact fills; others prioritized fewer items per bin or broader distribution across columns.
+- Process structure: a few used a stepwise routine (check duplicates first, then pick the more "obvious/orderly one); others anchored on the left panel and looked for disliked differences on the right.
+- Interpretability vs optimality conflation: a small number spoke about "better/optimized solutions despite both being optimal.
+
+***** Criteria for "Easier to Understand
+- Predictable spatial order: bins sorted by capacity (left-to-right), allocations that form neat, descending or diagonal visual patterns.
+- Largest-first logic: intuitive greedy progression from big bins/items to smaller ones.
+- Reduced arithmetic/visual complexity: fewer dots per column, fewer mixed colors, round/"easy sums, single-item fills.
+- Completion signals: exactly filled bars, more full bins, fewer leftover items.
+- Consistency with one's own solving strategy: alignments with personal approach felt more interpretable.
+- Quick visual parsing: what could be grasped at a glance; clearer typography/figures; top bars aiding comparison.
+- Absence of irregularities: avoid empties in the middle; prefer allocations clustered to the left/top-left.
+
+***** Cognitive Processes
+- Heuristics: greedy (largest-first), left-to-right/scanline bias, top-left anchoring, symmetry/gestalt preference, round-number/easy-sum bias, chunking (single-item columns).
+- Decision patterns: anchor-and-contrast (evaluate left, then find differences on right), elimination of duplicates before comparing, speed-accuracy emphasis ("fastest to understand).
+- Mental simulation: comparing panels to one's own method; using prior-trial strategy as a template.
+- Visual search: column-by-column/dot tracking; attention to top summary bars.
+- Load minimization: avoidance of multi-part sums and mixed colors to reduce working memory/arithmetical effort.
+
+***** Implications
+- Interpretability is driven by visual regularity and cognitive economy: people prefer solutions that align with a simple greedy narrative and are easy to parse at a glance.
+- Sorting and layout matter: presenting bins/items in descending order and emphasizing left-to-right filling improves perceived clarity.
+- Visualization that highlights exact fills and reduces within-column mixing supports understanding by lowering arithmetic/WM demands.
+- Users map displays to their own mental strategies; interfaces that reflect common heuristics (largest-first, left-to-right) are perceived as clearer.
+- Support for equivalence recognition (e.g., indicating isomorphic duplicates) may reduce confusion when two optimal solutions differ only by ordering.
+
+* Load Metrics :noexport:
+#+MACRO: n   src_elisp{(my/fmt-int (apply 'my/json-get "$1" (split-string "$2" "\\.")))}
+#+MACRO: f   src_elisp{(my/fmt     (apply 'my/json-get "$1" (split-string "$2" "\\.")) "$3")}
+#+MACRO: p src_elisp{(my/fmt-p (apply 'my/json-get "$1" (split-string "$2" "\\.")))}
+#+MACRO: pct src_elisp{(my/fmt-pct (apply 'my/json-get "$1" (split-string "$2" "\\.")) "$3")}
+#+MACRO: r   src_elisp{(my/fmt-range (apply 'my/json-get "$1" (split-string "$2" "\\.")) (apply 'my/json-get "$1" (split-string "$3" "\\.")) "$4")}
+#+MACRO: s   src_elisp{(my/fmt-str  (apply 'my/json-get "$1" (split-string "$2" "\\.")))}
+#+MACRO: rpct src_elisp{(my/fmt-range-pct (apply 'my/json-get "$1" (split-string "$2" "\\.")) (apply 'my/json-get "$1" (split-string "$3" "\\.")) "$4")}
+
+
+#+name: json-setup
+#+begin_src emacs-lisp :results none
+(require 'json)
+
+;; Base dir and short aliases → relative JSON paths
+;; (defvar-local my/json-base (expand-file-name "~/Dropbox/data_export/joptim-analysis/pub"))
+
+;; this variant might work more reliable?
+(setq-local my/json-base (expand-file-name "~/Dropbox/data_export/joptim-analysis/pub"))
+
+(setq-local my/json-paths
+            '(("choice_e"   . "exploratory/mlm_choice/mlm_choice.json")
+              ("choice_c"   . "confirmatory/mlm_choice/mlm_choice.json")
+              ("rt_e" . "exploratory/mlm_rt/mlm_rt.json")
+              ("rt_c" . "confirmatory/mlm_rt/mlm_rt.json")
+              ("gaze_e"  . "exploratory/mlm_gaze/mlm_gaze.json")
+              ("gaze_c"  . "confirmatory/mlm_gaze/mlm_gaze.json")
+              ("demo_e"  . "exploratory/demographics/demographics.json")
+              ("demo_c"  . "confirmatory/demographics/demographics.json")
+              ("coherence_c"  . "confirmatory/coherence/coherence.json")
+              ("coherence_e"  . "exploratory/coherence/coherence.json")
+              ("desc_c" . "confirmatory/descriptives/descriptives.json")
+              ("desc_e" . "exploratory/descriptives/descriptives.json")
+              ))
+
+;; Cache: buffer-local var and safe init/clear
+(defvar-local my/json-cache nil
+  "Hash-table cache for parsed JSON (buffer-local).")
+
+(defun my/json--ensure-cache ()
+  "Initialize my/json-cache if needed."
+  (unless (hash-table-p my/json-cache)
+    (setq my/json-cache (make-hash-table :test 'equal))))
+
+(defun my/json-clear-cache ()
+  "Clear the JSON cache safely (used by the export hook)."
+  (my/json--ensure-cache)
+  (clrhash my/json-cache))
+
+;; Path resolution
+(defun my/json--path (id)
+  "Map short ID or path string to full file path."
+  (let* ((id (format "%s" id))
+         (rel (or (cdr (assoc id my/json-paths)) id)))
+    (expand-file-name rel my/json-base)))
+
+;; Robust parser across Emacs versions (uses json-read)
+(defun my/json-parse-file (path)
+  "Parse JSON file PATH into a hash-table/list structure."
+  (with-temp-buffer
+    (insert-file-contents path)
+    (let ((json-object-type 'hash-table)
+          (json-array-type 'list)
+          (json-key-type 'string))
+      (json-read))))
+
+;; Loader
+(defun my/json-load (id)
+  "Load and cache parsed JSON; reloads per export."
+  (my/json--ensure-cache)
+  (let* ((path (my/json--path id))
+         (cached (gethash path my/json-cache)))
+    (or cached
+        (let ((data (my/json-parse-file path)))
+          (puthash path data my/json-cache)
+          data))))
+
+;; Getter
+(defun my/json-get (id &rest keys)
+  "Get nested value from JSON via alias ID and KEYS (strings/symbols/ints).
+Errors if file or key is missing."
+  (let* ((obj (my/json-load id))
+         (val obj))
+    (dolist (k keys)
+      (setq k
+            (cond
+             ((stringp k) k)
+             ((symbolp k)
+              (let ((s (symbol-name k)))
+                (if (and (> (length s) 0) (eq (aref s 0) ?:))
+                    (substring s 1) s)))
+             ((integerp k) k)
+             (t (format "%s" k))))
+      (cond
+       ((hash-table-p val)
+        (setq val (gethash k val)))
+       ((listp val)
+        (setq val
+              (cond
+               ((integerp k) (nth k val))
+               ((and (stringp k) (string-match-p "^[0-9]+$" k))
+                (nth (string-to-number k) val))
+               (t (error "List index must be int (got %S)" k)))))
+       (t (error "Cannot descend into %S with key %S" val k))))
+    (unless val (error "Missing JSON key %S in %s" keys (my/json--path id)))
+    val))
+
+;; Formatting helpers (abort on invalids)
+(defun my/fmt (x &optional spec)
+  (let ((spec (or spec "%.2f")))
+    (cond
+     ((null x) (error "Missing value"))
+     ;; NaN check: a NaN float is not equal to itself
+     ((and (floatp x) (not (eq x x))) (error "Invalid float (NaN)"))
+     ((numberp x) (format spec (float x)))
+     (t (error "Non-numeric value: %S" x)))))
+
+;; has no 1000 separators
+;; (defun my/fmt-int (x)
+;;  (unless (numberp x) (error "Missing/invalid int"))
+;;  (format "%d" (truncate x)))
+
+(defun my/fmt-int (x &optional sep)
+  (unless (numberp x) (error "Missing/invalid int"))
+  (let* ((s   (format "%d" (truncate x)))
+         (neg (string-prefix-p "-" s))
+         (d   (if neg (substring s 1) s))
+         (sep (or sep ","))
+         (n   (length d))
+         (out "")
+         (i   0))
+    (while (< i n)
+      (setq out (concat out (string (aref d i))))
+      (let ((remain (- n i 1)))
+        (when (and (> remain 0) (= (mod remain 3) 0))
+          (setq out (concat out sep))))
+      (setq i (1+ i)))
+    (if neg (concat "-" out) out)))
+
+(defun my/fmt-pct (x &optional spec)
+  (unless (numberp x) (error "Missing/invalid pct"))
+  (format (or spec "%.1f%%") (* 100.0 x)))
+
+(defun my/fmt-range (lo hi &optional spec)
+  (format "%s–%s"
+          (my/fmt lo (or spec "%.2f"))
+          (my/fmt hi (or spec "%.2f"))))
+
+(defun my/fmt-range-pct (lo hi &optional spec)
+  "Format LO–HI as a percent range with multiplication by 100."
+  (format "%s–%s"
+          (my/fmt-pct lo (or spec "%.1f%%"))
+          (my/fmt-pct hi (or spec "%.1f%%"))))
+
+(defun my/fmt-str (s)
+  (unless (and (stringp s) (> (length s) 0))
+    (error "Missing/empty string"))
+  s)
+
+;; to report percent change implied by a log-RT coefficient:
+;; percent \approx (exp(b) - 1) * 100
+(defun my/fmt-exp-pct (x &optional spec)
+  (let* ((val (float x))
+         (pct (* 100.0 (- (exp val) 1.0))))
+    (format (or spec "%.1f%%") pct)))
+
+(defun my/fmt-p (p)
+  "Format p-values with < 0.001 rule."
+  (cond
+    ((or (null p) (not (numberp p))) (error "Invalid p"))
+    ((< p 0.001) "< 0.001")
+    (t (format "%.3f" p))))
+
+  #+end_src
+
+
+  
+
+* LocVar :noexport:
+# Local Variables:
+# mode: org
+# eval: (add-hook 'org-export-before-processing-hook (lambda (_backend) (let ((pos (org-babel-find-named-block "json-setup"))) (when pos (goto-char pos) (org-babel-execute-src-block))) (when (fboundp 'my/json-clear-cache) (my/json-clear-cache))) nil t)
+# End:
