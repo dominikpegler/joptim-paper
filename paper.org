@@ -1,14 +1,14 @@
 :PROPERTIES:
 :ID: 0279ae6b-5eb9-4156-94ca-bf9262071696
 :END:
-#+title: Unpacking Complexity: Human Preference Guides Interpretable Combinatorial Solutions
+#+title: Unpacking Interpretability: Human-Centered Criteria for Optimal Combinatorial Solutions
 #+project: JOptim paper
 #+created: [2023-10-30 Mon]
 #+last_modified: [2023-10-30 Mon 22:24]
 #+PUBLISH_DIR:2025_joptim
 #+LATEX_HEADER:\authorsnames[1, 2, 1, 1, 1]{Dominik Pegler, Frank Jäkel, David Steyrl, Frank Scharnowski, Filip Melinscak}
 #+LATEX_HEADER:\authorsaffiliations{{Department of Cognition, Emotion, and Methods in Psychology, Faculty of Psychology, University of Vienna}, {Centre for Cognitive Science \& Institute of Psychology, TU Darmstadt}}
-#+LaTeX_HEADER:\shorttitle{Interpretable Combinatorial Solutions}
+#+LaTeX_HEADER:\shorttitle{INTERPRETABILITY CRITERIA FOR OPTIMAL COMBINATORIAL SOLUTIONS}
 #+LaTeX_HEADER:\authornote{
 #+LaTeX_HEADER:Corresponding author: Dominik Pegler. E-mail: \texttt{dominik.pegler@univie.ac.at}}
 #+setupfile: setupfile_apa7.org
@@ -23,7 +23,7 @@
 # Human Preference Reveals Structural Principles for Interpretable Optimization
 # to publish as preprint run my/org-preprint-export and find it in the ~/Dropbox/preprints folder
 
-#+LATEX_HEADER:\abstract{Automated planners often return optimal solutions that are hard to understand, making interpretability a prerequisite for effective human–algorithm collaboration. In combinatorial packing, where many solutions can be equally optimal, a feature-based account of what makes one solution clearer than another is still lacking. Here we ask which structural properties of optimal packing solutions drive human interpretability. We present a psychophysical paradigm using a multiple subset sum variant of bin packing in which participants chose which of two equally optimal solutions was easier to understand. We show that preferences reliably track three quantifiable properties of solution structure: alignment with a greedy heuristic, simpler within-bin composition, and ordered visual representation. The strongest and most reproducible associations were observed for simple compositions and ordered representations, with heuristic alignment also showing a consistent association. Reaction-time evidence was mixed, with faster responses observed primarily when heuristic differences were larger, and aggregate webcam-based gaze showed no reliable complexity effects. These results provide a concrete, feature-based account of interpretability in optimal packing solutions, linking stimulus structure to human preference. By identifying actionable properties --- simple compositions, ordered representation, and heuristic alignment --- our findings support "interpretability-aware" optimization and presentation of machine solutions, and outline a path to quantify trade-offs between optimality and interpretability in real-world allocation and design tasks.}
+#+LATEX_HEADER:\abstract{Automated planners often return optimal solutions that are hard to understand, making interpretability a prerequisite for effective human–algorithm collaboration. In combinatorial packing, where many solutions can be equally optimal, a feature-based account of what makes one solution clearer than another is still lacking. Here we ask which structural properties of optimal packing solutions drive human interpretability. We present a psychophysical paradigm using a multiple subset sum variant of bin packing in which participants chose which of two equally optimal solutions was easier to understand. We show that preferences reliably track three quantifiable properties of solution structure: alignment with a greedy heuristic, simpler within-bin composition, and ordered visual representation. The strongest and most reproducible associations were observed for simple compositions and ordered representations, with heuristic alignment also showing a consistent association. Reaction-time evidence was mixed, with faster responses observed primarily when heuristic differences were larger, and aggregate webcam-based gaze showed no reliable effects of complexity. These results provide a concrete, feature-based account of interpretability in optimal packing solutions, linking stimulus structure to human preference. By identifying actionable properties --- simple compositions, ordered representation, and heuristic alignment --- our findings support "interpretability-aware" optimization and presentation of machine solutions, and outline a path to quantify trade-offs between optimality and interpretability in real-world allocation and design tasks.}
 #+LATEX_HEADER:\keywords{Multiple Subset Sum, Human-Machine Collaboration, Problem Solving, Interpretability}
 
 * TODOs :noexport:
@@ -95,7 +95,7 @@ As shown in Figure ref:fig:complexity, we operationalize these ideas with three 
 
 ** Prior Work and Gap
 
-Explainable planning emphasizes aligning plans with users' mental models --- through model reconciliation, contrastive rationales, or plan annotations --- highlighting that intelligibility depends on both derivation and presentation [cite/p:@foxExplainablePlanning2017; @chakrabortiPlanExplanationsModel2017]. In bin packing and knapsack research, structural regularities and greedy heuristics are well-characterized [cite/p:@coffmanApproximationAlgorithmsBin1997; @kellererKnapsackProblems2004]. Behavioral work shows that humans rely on simple strategies and that performance depends on instance structure [cite/p:@macgregorHumanPerformanceTraveling2011; @dumnicPathGameCrowdsourcingTimeconstrained2019; @murawskiHowHumansSolve2016; @francoGenericPropertiesComputational2021; @francoTaskindependentMetricsComputational2022]. Even when asked to discriminate between solutions of varying optimality, humans may struggle to consistently identify the truly optimal option, suggesting inherent difficulties in evaluating complex combinatorial outputs [cite/p:@kyritsisPerceivedOptimalityCompeting2022]. While explainable planning offers methods for justifying and aligning plans with users' mental models, and work on predictive explanations has advanced substantially in the field of explainable artificial intelligence (XAI; [cite//bare:@barredoarrietaExplainableArtificialIntelligence2020; @rudinStopExplainingBlack2019]), empirical and feature-based accounts of interpretability for combinatorial optimization solutions are still emerging [cite/p:@ibsHumanExplanationsExplainable2024]. We still lack an empirical, feature-based account that predicts perceived interpretability among equally optimal packing solutions; related studies on competing solutions in other combinatorial domains likewise examine preferences without specifying solution-level structural metrics [cite/p:@kyritsisPerceivedOptimalityCompeting2022]. Our study addresses this gap by quantifying how three solution-level properties --- HC, CC, and VC --- predict human choices, response speed, and attention when comparing equally optimal packing solutions.
+Explainable planning emphasizes aligning plans with users' mental models --- through model reconciliation, contrastive rationales, or plan annotations --- highlighting that intelligibility depends on both derivation and presentation [cite/p:@foxExplainablePlanning2017; @chakrabortiPlanExplanationsModel2017]. In bin packing and knapsack research, structural regularities and greedy heuristics are well-characterized [cite/p:@coffmanApproximationAlgorithmsBin1997; @kellererKnapsackProblems2004]. Behavioral work shows that humans rely on simple strategies and that performance depends on instance structure [cite/p:@macgregorHumanPerformanceTraveling2011; @dumnicPathGameCrowdsourcingTimeconstrained2019; @murawskiHowHumansSolve2016; @francoGenericPropertiesComputational2021; @francoTaskindependentMetricsComputational2022]. Even when asked to discriminate between solutions of varying optimality, humans may struggle to consistently identify the truly optimal option, suggesting inherent difficulties in evaluating complex combinatorial outputs [cite/p:@kyritsisPerceivedOptimalityCompeting2022]. While explainable planning offers methods for justifying and aligning plans with users' mental models, and work on predictive explanations has advanced substantially in the field of explainable artificial intelligence (XAI; [cite//bare:@barredoarrietaExplainableArtificialIntelligence2020; @rudinStopExplainingBlack2019]), empirical and feature-based accounts of interpretability for combinatorial optimization solutions are still emerging [cite/p:@ibsHumanExplanationsExplainable2024]. Related work on competing solutions in other combinatorial domains likewise examines preferences without specifying solution-level structural metrics [cite/p:@kyritsisPerceivedOptimalityCompeting2022]. Our study addresses this gap by quantifying how three solution-level properties --- HC, CC, and VC --- predict human choices, response speed, and attention when comparing equally optimal packing solutions.
 
 Beyond describing cues that shape interpretability, our aim is practical: enable interpretability-aware optimization. Embedding HC and CC as secondary criteria --- e.g., tie-breaking among equal-value optima or soft penalties in multi-objective formulations --- would let optimizers return solutions that are both optimal and easy to understand [cite/p:@ehrgottMulticriteriaOptimization2005].
 
@@ -113,7 +113,7 @@ Our study centered on the multiple subset sum problem described above [cite/p:@j
 ** Pre-Registered Hypotheses and Analysis Plan
 We tested our three solution-level properties as drivers of interpretability preferences: HC, CC, and VC, with DD as a visual-layout covariate (full definitions in [[#methods][Methods]]).
 
-Because participants evaluated pairs of equally optimal solutions, our analyses use between-solution differences derived from these solution-level metrics: signed right–left differences for choices and gaze (to predict which option is preferred or inspected more), and absolute differences for reaction times (to test whether larger separations speed decisions). This framing allows us to link interpretable, stimulus-level structure directly to behavioral preferences, processing speed, and attention. We complement preferences with two process measures: Reaction times index overall processing effort and decisional conflict [cite/p:@luceResponseTimesTheir1986]. Webcam-based eye tracking provides aggregate dwell measures that indicate relative attention to the left versus right solution [cite/p:@papoutsakiWebgazerScalableWebcam2016; @ecksteinEyeGazeWhat2017; @gollanGazeQuantifyingConscious2025]. Given lower spatial precision online, we analyze side-wise dwell differences rather than fine-grained scanpaths.
+Because participants evaluated pairs of equally optimal solutions, our analyses use between-solution differences derived from these solution-level metrics: signed right–left differences for choices and gaze (to predict which option is preferred or inspected more), and absolute differences for reaction times (to test whether larger separations speed decisions). This framing allows us to link interpretable, stimulus-level structure directly to behavioral preferences, processing speed, and attention. We complement preferences with two process measures: reaction times index overall processing effort and decisional conflict [cite/p:@luceResponseTimesTheir1986]. Webcam-based eye tracking provides aggregate dwell measures that indicate relative attention to the left versus right solution [cite/p:@papoutsakiWebgazerScalableWebcam2016; @ecksteinEyeGazeWhat2017; @gollanGazeQuantifyingConscious2025]. Given lower spatial precision online, we analyze side-wise dwell differences rather than fine-grained scanpaths.
 
 We conducted an exploratory study to refine metrics --- fitting CC's parameters to behavioral data --- followed by a preregistered confirmatory study using the fixed metrics. We hypothesized that, within a pair of equally optimal solutions, participants would prefer the option with lower HC, CC, and VC; that larger absolute differences would speed decisions; and that more complex solutions would attract relatively more dwell time. The Results report confirmatory findings and compare them with exploratory patterns.
 
@@ -140,7 +140,7 @@ As introduced, our study focused on the multiple subset sum problem (MSSP; [cite
 
 \noindent Here \(x_{ij}\) equals 1 if item \(j\) is placed in bin \(i\), and 0 otherwise. This fixed-bin, maximization objective differs from the classical bin packing objective of minimizing the number of bins. Figure ref:fig:problem illustrates an instance of our bin-packing variant and its experimental representation. Rows correspond to items and columns to bins. Block lengths and labels indicate item sizes \(z_{j}\), and filled cells (dots) in the assignment matrix indicate assignments \(x_{ij} = 1\). The number shown at the top right is the current score, i.e., the objective value \(\sum_{i,j}\ z_{j}\ x_{ij}\) in Equation ref:eqn-obj.
 
-For the experiment, we randomly generated a large set of problem instances subject to several constraints. Each of these problem instances consisted of between 4 and 6 bins and between 7 and 9 items. In addition, all problem instances satisfied the following conditions: (1) No item size is larger than the largest bin; (2) No bin capacity is smaller than the smallest item; (3) The ratio of the sum of item sizes to sum of bin capacities is between 0.8 and 1.0; (4) There are at least two different optimal solutions. These constraints were chosen to create a sample of problems that are simple yet nontrivial. In particular, setting the size to 4--6 bins and to 7--9 items helps to reduce symmetry (especially given the approximate one-to-one relationship between the sum of item sizes and total bin capacities) and makes it less likely that the optimal solution simply corresponds to a one-to-one mapping between items and bins --- an outcome that would be too obvious to solve or evaluate. We also assume that, in many real-world applications such as resource allocation and scheduling, there are typically more items than bins. A detailed description of how problem instances and their optimal solutions were generated can be found in Appendix ref:sec:stimulus-generation.
+For the experiment, we randomly generated a large set of problem instances subject to several constraints. Each of these problem instances consisted of between 4 and 6 bins and between 7 and 9 items. In addition, all problem instances satisfied the following conditions: (1) No item size is larger than the largest bin; (2) No bin capacity is smaller than the smallest item; (3) The ratio of the sum of item sizes to sum of bin capacities is between 0.8 and 1.0; (4) There are at least two different optimal solutions. These constraints were chosen to create a sample of problems that are simple yet nontrivial. In particular, setting the size to 4--6 bins and to 7--9 items helps to reduce symmetry (especially given the approximate one-to-one relationship between the sum of item sizes and total bin capacities) and makes it less likely that the optimal solution simply corresponds to a one-to-one mapping between items and bins --- an outcome that would be too obvious to solve or evaluate. We also assume that, in many real-world applications such as resource allocation and scheduling, there are typically more items than bins [cite/p:@kellererKnapsackProblems2004; @cacchianiKnapsackProblemsOverview2022]. A detailed description of how problem instances and their optimal solutions were generated can be found in Appendix ref:sec:stimulus-generation.
 
 ** Overview of Experimental Design
 :PROPERTIES:
@@ -474,6 +474,12 @@ A total of {{{n(demo_c,counts.N_completed)}}} participants recruited from Prolif
 
 In the confirmatory study, a pool of 5,000 evaluation trials for a maximum of 200 participants was generated (details in Appendix ref:sec:trial-generation). The range and distribution of our primary predictors across trials in our confirmatory sample ({{{n(choice_c,n_obs)}}} trials from {{{n(choice_c,n_participants)}}} participants) are shown in Appendix ref:sec:supplementary-results (Figures ref:fig:scatter-matrix-signed and ref:fig:scatter-matrix-abs). 
 
+** Preregistration
+We preregistered hypotheses, primary outcomes, predictors, sample size, exclusion criteria, and the analysis plan for the confirmatory study at OSF prior to data collection (registration date: 2025-11-07; https://osf.io/d2aq7/; DOI: 10.17605/OSF.IO/D2AQ7). The exploratory study preceded this registration and was used to refine metrics and stimuli. Any deviations from the preregistered plan are listed below.
+
+*** Deviations from Preregistration
+We implemented one deviation and logged it on 2025-12-01 in the OSF record. For the reaction-time (RT) analyses, we added self-reported problem-solving skills (PSI; z-scored; [cite/p:@heppnerDevelopmentImplicationsPersonal1982]) as a potential covariate. This corrected an oversight: PSI (self-report) and PSE (behavioral performance; preregistered potential covariate) capture complementary constructs that can both influence RT. The change affected only RT models; choice and gaze analyses remained as preregistered. In the AIC-based model selection, the final RT model did not include PSI, and including PSI as a candidate ultimately did not change the pattern of significant effects or the conclusions. No other deviations occurred.
+
 ** Ethical Considerations
 :PROPERTIES:
 :CUSTOM_ID: ethical-considerations
@@ -616,19 +622,43 @@ We hypothesized that complexity differences would manifest in attentional asymme
 :CUSTOM_ID: limitations
 :END:
 
-First, construct validity is a concern. We measured interpretability with a single question ("Which of the two solutions do you find easier to understand?"), and our conclusions depend on how participants understood this prompt and on the strategies they used to decide. Metrics like CC and VC index structural cues that we assume facilitate understanding. However, participants may have used these cues directly --- selecting solutions with neat order or exact fills because they were appealing --- without deeper comprehension [cite/p:@feldmanSimplicityPrinciplePerception2016; @vanderhelmSimplicityLikelihoodVisual2000]. Such cue-driven choices could conflate "easier" with "better," reducing construct specificity. Notably, the consistent influence of HC partly mitigates this concern, as favoring heuristic-aligned solutions implies some engagement with a solution beyond surface layout. A stronger test would complement preference with performance-based tasks that require using or completing partially completed solutions.
+Our study has several limitations. First, the construct validity of our interpretability measure may be a concern. By relying on a single subjective preference question ("Which of the two solutions do you find easier to understand?"), our conclusions depend on how participants interpreted this prompt. It is possible that choices were influenced by factors such as visual appeal or alignment with personal biases, potentially conflating "ease of understanding" with a mere "liking" for certain visual characteristics [cite/p:@feldmanSimplicityPrinciplePerception2016; @vanderhelmSimplicityLikelihoodVisual2000]. However, the consistent influence of heuristic alignment (HC) suggests some engagement with a solution beyond superficial visual cues.
 
-Second, ecological validity was constrained. Participants judged completed optimal solutions under unlimited time. Real deployments often involve partial solutions, constraints, risk, and deadlines; interpretability may then interact with accountability and trust [cite/p:@leeTrustAutomationDesigning2004; @dietvorstAlgorithmAversionPeople2015]. Third, we examined relatively small instances (4–6 bins, 7–9 items). Larger, more complex problems may amplify or shift which cues dominate interpretability. Fourth, our heuristic-related complexity (HC) metric instantiated a single greedy strategy (largest-bin, largest-item first); other human-plausible heuristics (e.g., best-fit decreasing; [cite//bare:@johnsonWorstcasePerformanceBounds1974;@coffmanApproximationAlgorithmsBin1997;@kellererKnapsackProblems2004]) may yield additional or alternative alignment signals. Finally, webcam-based gaze measurement limited spatial precision and precluded scanpath-level analyses.
+
+Second, our experimental setup, which involved participants judging fully computed optimal solutions without time pressure, presents a trade-off in ecological validity. While this controlled environment allowed for clear comparisons, it deviates from real-world resource allocation and design tasks, which often entail partial solutions, dynamic constraints, risks, and deadlines [cite/p:@leeTrustAutomationDesigning2004; @dietvorstAlgorithmAversionPeople2015].
+
+Third, the generalizability of our findings is constrained by the scope of the stimuli. We examined relatively small problem instances (4–6 bins, 7–9 items) and defined heuristic-related complexity based on a single greedy strategy (largest-bin, largest-item first). The applicability of these results to larger, more complex problems or alternative human-plausible heuristics [cite/p:@johnsonWorstcasePerformanceBounds1974;@coffmanApproximationAlgorithmsBin1997;@kellererKnapsackProblems2004] remains to be determined.
+
+Finally, the use of webcam-based eye tracking for gaze measurement introduced limitations in spatial precision. This restricted our ability to conduct fine-grained analyses such as scanpaths and may have reduced our sensitivity to detect subtle, complexity-driven attentional dynamics [cite/p:@papoutsakiWebgazerScalableWebcam2016].
+
+** Limitations note :noexport:
+:PROPERTIES:
+:CUSTOM_ID: limitations
+:END:
+
+
+Metrics like CC and VC index structural cues that we assume facilitate understanding. However, participants may have used these and other visual cues /directly/ --- selecting solutions with neat order or exact fills because they were appealing --- without having understandability in mind [cite/p:@feldmanSimplicityPrinciplePerception2016; @vanderhelmSimplicityLikelihoodVisual2000]. Such cue-driven choices could conflate "easier to understand" with "like better," reducing construct specificity. Notably, the consistent influence of HC partly mitigates this concern, as favoring heuristic-aligned solutions implies some engagement with a solution beyond surface layout.
+
+
 
 ** Future Directions
 
+Future work should prioritize enhancing the construct and ecological validity of our measures. Beyond subjective preferences, we can develop performance-based assessments. For instance, a process-level paradigm where participants complete partially finished solutions could yield task-based indices of solution usability, such as accuracy and time. To gather richer subjective data, we aim to develop dedicated questionnaires for perceived interpretability, cognitive load, and satisfaction [cite/p:@afsarDesigningEmpiricalExperiments2023; @doshi-velezRigorousScienceInterpretable2017; @narayananHowHumansUnderstand2018], while also drawing deeper insights from analyses of the current dataset's free-text evaluation reports. Concurrently, integrating laboratory eye tracking and pupillometry would offer richer insights into early attentional allocation and cognitive load dynamics related to HC, CC, and VC, directly addressing the limitations inherent in webcam-based gaze measurement [cite/p:@ecksteinEyeGazeWhat2017; @gollanGazeQuantifyingConscious2025]. To better reflect real-world resource allocation and design tasks, embedding time pressure and hard constraints within these experimental paradigms would be essential for improving ecological validity [cite/p:@leeTrustAutomationDesigning2004; @dietvorstAlgorithmAversionPeople2015].
+
+Generalizing our findings is a crucial next step. This involves validating our metrics across a broader range of packing and knapsack variants, including larger and more complex problem instances [cite/p:@kellererKnapsackProblems2004; @cacchianiKnapsackProblemsOverview2022; @gurskiKnapsackProblemsParameterized2019]. Furthermore, future studies should explore other human-plausible heuristics beyond the largest-bin, largest-item first strategy when computing HC [cite//bare:@johnsonWorstcasePerformanceBounds1974;@coffmanApproximationAlgorithmsBin1997;@kellererKnapsackProblems2004]. Directly examining presentation strategies is vital; this includes comparing stepwise derivations (e.g., replaying solution sequence or interactive reveals) to static final solutions. Such work could test whether showing the solution sequence improves understanding particularly for heuristic-aligned solutions [cite/p:@foxExplainablePlanning2017; @chakrabortiPlanExplanationsModel2017; @tverskyAnimationCanIt2002]. Personalizing machine-generation and presentation of solutions based on user-specific preferences  also represents a promising direction for human–algorithm collaboration [cite/p:@millerExplanationArtificialIntelligence2019; @zerilliHowTransparencyModulates2022].
+
+A significant theoretical and practical challenge involves quantifying interpretability–optimality trade-offs. We can achieve this by introducing suboptimal solutions for evaluation or integrating interpretability terms as secondary objectives within multi-objective optimization formulations [cite/p:@ehrgottMulticriteriaOptimization2005]. Such studies would help identify when people prefer simpler, objectively worse solutions and map decision regions where interpretability might outweigh strict optimality. Ultimately, a longer-term goal is to develop a unified cognitive model that integrates HC, CC, and VC to explain choices, reaction times, and attention. Validating this model through out-of-sample prediction and physiological process measures (e.g., gaze, pupillometry) would offer a comprehensive framework for understanding human interpretability in complex decision environments [cite/p:@luceResponseTimesTheir1986; @ecksteinEyeGazeWhat2017; @francoGenericPropertiesComputational2021; @francoTaskindependentMetricsComputational2022].
+
+
+** Future Directions OLD :noexport:
+
 Beyond preference judgments, we propose a process-level paradigm in which participants are shown partially completed solutions and asked to complete them. In this setup, interpretability is operationalized by completion performance --- accuracy and time --- providing task-based indices of how usable a solution is. Combining this paradigm with laboratory eye tracking and pupillometry would offer richer insights into early attention and cognitive load dynamics related to HC, CC, and VC, and embedding time pressure and hard constraints would improve ecological validity [cite/p:@ecksteinEyeGazeWhat2017; @gollanGazeQuantifyingConscious2025].
 
-Robust measurement and generalization are also crucial. This involves developing questionnaires for perceived interpretability, cognitive load, and satisfaction to complement choice data [cite/p:@afsarDesigningEmpiricalExperiments2023; @doshi-velezRigorousScienceInterpretable2017; @narayananHowHumansUnderstand2018]. Generalization to other packing and knapsack variants, as well as larger instances, also needs to be assessed [cite/p:@kellererKnapsackProblems2004; @cacchianiKnapsackProblemsOverview2022; @gurskiKnapsackProblemsParameterized2019].
+Robust measurement and generalization are also crucial. This involves developing questionnaires for perceived interpretability, cognitive load, and satisfaction to complement choice data [cite/p:@afsarDesigningEmpiricalExperiments2023; @doshi-velezRigorousScienceInterpretable2017; @narayananHowHumansUnderstand2018]. As a near-term step, we will analyze the free-text evaluation-strategy reports to assess whether participants' judgments primarily stem from the task's core interpretability goal or from a direct, superficial preference for visual cues. Generalization to other packing and knapsack variants, as well as larger instances, also needs to be assessed [cite/p:@kellererKnapsackProblems2004; @cacchianiKnapsackProblemsOverview2022; @gurskiKnapsackProblemsParameterized2019].
 
-Directly examining heuristics and presentation is also vital. This includes testing multiple human-plausible heuristics when computing HC and comparing stepwise derivations (replay or interactive reveal) to static final solutions to test whether showing the construction improves understanding specifically for heuristic-aligned solutions [cite/p:@foxExplainablePlanning2017; @chakrabortiPlanExplanationsModel2017; @tverskyAnimationCanIt2002]. Personalizing formatting based on user-specific preferences (e.g., habitual heuristics) and assessing whether alignment improves performance and trust also represents a promising direction [cite/p:@millerExplanationArtificialIntelligence2019; @zerilliHowTransparencyModulates2022].
+Directly examining heuristics and presentation is also vital. This includes testing multiple human-plausible heuristics (see [[#limitations][Limitations]]) when computing HC and comparing stepwise derivations (replay or interactive reveal) to static final solutions to test whether showing the construction improves understanding specifically for heuristic-aligned solutions [cite/p:@foxExplainablePlanning2017; @chakrabortiPlanExplanationsModel2017; @tverskyAnimationCanIt2002]. Personalizing formatting based on user-specific preferences (e.g., habitual heuristics) and assessing whether alignment improves performance and trust also represents a promising direction [cite/p:@millerExplanationArtificialIntelligence2019; @zerilliHowTransparencyModulates2022].
 
-Future work should also quantify interpretability–optimality trade-offs, for instance, by introducing suboptimal solutions or through multi-objective formulations that include interpretability terms. This would help identify when people prefer simpler, objectively worse solutions and map decision regions where interpretability outweighs strict optimality [cite/p:@ehrgottMulticriteriaOptimization2005; @rudinStopExplainingBlack2019; @barredoarrietaExplainableArtificialIntelligence2020].
+Future work should also quantify interpretability–optimality trade-offs, for instance, by introducing suboptimal solutions or through multi-objective formulations that include interpretability terms [cite/p:@ehrgottMulticriteriaOptimization2005]. This would help identify when people prefer simpler, objectively worse solutions and map decision regions where interpretability outweighs strict optimality.
 
 A longer-term goal is a unified cognitive model that explains choices, response times, and attention from shared latent constructs. This would involve embedding HC, CC, and VC in probabilistic utility or evidence-accumulation models with participant-level parameters, and validating these models via out-of-sample prediction and process measures (gaze, pupil) [cite/p:@luceResponseTimesTheir1986; @ecksteinEyeGazeWhat2017; @francoGenericPropertiesComputational2021; @francoTaskindependentMetricsComputational2022; @feldmanSimplicityPrinciplePerception2016].
 
@@ -894,7 +924,7 @@ Thus, in the exploratory study CC primarily penalized many-item bins and mid-fil
 :CUSTOM_ID: choice
 :END:
 
-All four predictors were significant negative predictors of the ordered outcome; a $1-\text{SD}$ increase reduced the odds of a higher category by {{{rpct(choice_e,coefs.diff_cc_v2_RvL_z.exp_pct_abs,coefs.diff_disorder_RvL_z.exp_pct_abs,%.0f%%)}}} (strongest for /visual-order complexity/), with substantial between-participant variability (Table ref:tab:choice-exploratory). Figure ref:fig:choice-probabilities-exploratory illustrates how differences in stimulus complexity are reflected in participants' choice behaviour. The conditional Nakagawa $R^2$ of {{{f(choice_e,r2.cond,%.2f)}}} indicates that the model's fixed and random effects explain about {{{pct(choice_e,r2.cond,%.0f%%)}}} of the variance in the data, while the marginal Nakagawa $R^2$ of {{{f(choice_e,r2.marg,%.2f)}}} shows that the fixed effects alone account for approximately {{{pct(choice_e,r2.marg,%.0f%%)}}}. This value is well below the coherence ceiling of {{{f(coherence_e,p_coherent,%.3f)}}}, derived from the {{{pct(coherence_e,p_coherent,%.2f%%)}}} of participants who demonstrated transitive judgments in the /coherence trials/, suggesting that a substantial portion of the decision variance may be random rather than systematic.
+All four predictors were significant negative predictors of the ordered outcome; a $1-\text{SD}$ increase reduced the odds of a higher category by {{{rpct(choice_e,coefs.diff_cc_v2_RvL_z.exp_pct_abs,coefs.diff_disorder_RvL_z.exp_pct_abs,%.0f%%)}}} (strongest for /visual-order complexity/), with substantial between-participant variability (Table ref:tab:choice-exploratory). Figure ref:fig:choice-probabilities-exploratory illustrates how differences in stimulus complexity are reflected in participants' choice behavior. The conditional Nakagawa $R^2$ of {{{f(choice_e,r2.cond,%.2f)}}} indicates that the model's fixed and random effects explain about {{{pct(choice_e,r2.cond,%.0f%%)}}} of the variance in the data, while the marginal Nakagawa $R^2$ of {{{f(choice_e,r2.marg,%.2f)}}} shows that the fixed effects alone account for approximately {{{pct(choice_e,r2.marg,%.0f%%)}}}. This value is well below the coherence ceiling of {{{f(coherence_e,p_coherent,%.3f)}}}, derived from the {{{pct(coherence_e,p_coherent,%.2f%%)}}} of participants who demonstrated transitive judgments in the /coherence trials/, suggesting that a substantial portion of the decision variance may be random rather than systematic.
 
 #+INCLUDE: "~/Dropbox/data_export/joptim-analysis/pub/exploratory/mlm_choice/tab_choice.tex" src latex
 
@@ -1300,6 +1330,298 @@ Participants judged interpretability primarily by visual order and cognitive eas
 - Visualization that highlights exact fills and reduces within-column mixing supports understanding by lowering arithmetic/WM demands.
 - Users map displays to their own mental strategies; interfaces that reflect common heuristics (largest-first, left-to-right) are perceived as clearer.
 - Support for equivalence recognition (e.g., indicating isomorphic duplicates) may reduce confusion when two optimal solutions differ only by ordering.
+
+* Literature mini review :noexport:
+
+# TODO: in the future, add a more comprehensive literature review to each paper.
+
+- [cite:@johnsonWorstcasePerformanceBounds1974]
+  - Classic bin packing paper establishing worst-case bounds for simple heuristics (first-fit, best-fit).
+  - Grounds our use of packing as a canonical combinatorial testbed with well-studied structure.
+  - Motivates "greedy-like" constructions that often produce diagonal-looking allocations.
+  - Supports linking heuristic alignment (HC) to known behaviors of effective simple algorithms.
+  - Provides historical authority for citing bin packing as a foundational problem in our domain.
+
+- [cite:@cacchianiKnapsackProblemsOverview2022]
+  - Survey of recent advances in multiple, multidimensional, and quadratic knapsack variants.
+  - Situates our problem within the broader knapsack landscape and real applications.
+  - Highlights the practical relevance of multi-bin resource allocation problems.
+  - Justifies focusing on structural properties across related knapsack formulations.
+  - Supports positioning MSSP as part of an active and evolving research area.
+
+- [cite:@capraraMultipleSubsetSum2000]
+  - Defines and analyzes the Multiple Subset Sum Problem (MSSP), including approximation results.
+  - Establishes MSSP as a key special case of generalized assignment problems.
+  - Justifies our task choice and terminology (multiple subset sum as a packing/knapsack variant).
+  - Connects to theoretical boundaries (PTAS) and structural insights relevant to solution form.
+  - Anchors our experimental instances in a well-defined optimization problem.
+
+- [cite:@gunawanTrendsMultidisciplinaryScheduling2021]
+  - Broad perspective on scheduling and resource allocation as central OR topics.
+  - Reinforces the cross-domain importance of allocation/packing problems.
+  - Helps motivate interpretability needs for complex, multidisciplinary scheduling outputs.
+  - Provides contemporary context for human-in-the-loop decision environments.
+  - Signals the growing integration of optimization with user-facing systems.
+
+- [cite:@marzoukNursePatientAssignment2021]
+  - Real-world assignment problem cast via bin-packing analogy in healthcare.
+  - Shows clinical staffing as a practical setting where interpretability matters.
+  - Demonstrates feasibility of heuristic methods in operational planning.
+  - Motivates studying equally optimal yet differently "usable" allocations.
+  - Connects our lab paradigm to high-impact applications.
+
+- [cite:@gurskiKnapsackProblemsParameterized2019]
+  - Parameterized complexity view on knapsack variants (KP, d-KP, MKP).
+  - Highlights practically small parameters that influence tractability and behavior.
+  - Motivates our bounded instance sizes (bins/items) for controlled human studies.
+  - Supports that structure-sensitive metrics can explain task difficulty.
+  - Links to themes of kernelization and pseudo-polynomial methods relevant to structure.
+
+- [cite:@doshi-velezRigorousScienceInterpretable2017]
+  - Offers definitions and evaluation taxonomy for interpretability in ML.
+  - Clarifies when interpretability is needed and how to measure it.
+  - Justifies modeling solution-level interpretability rather than model-level transparency.
+  - Motivates using human-centered criteria (verification cost/time) for explanations.
+  - Frames our feature-based account within a rigorous interpretability agenda.
+
+- [cite:@kahnemanThinkingFastSlow2011]
+  - Dual-process account: fast heuristics vs. slower analytic reasoning.
+  - Grounds why intuitive structure can foster trust and ease of understanding.
+  - Supports that humans prefer solutions aligning with familiar mental shortcuts.
+  - Connects interpretability to cognitive effort and decisional comfort.
+  - Motivates measuring RT and preference as process-level indicators.
+
+- [cite:@millerExplanationArtificialIntelligence2019]
+  - Synthesizes social-science insights on explanation generation and evaluation.
+  - Argues for human-grounded explanation principles beyond technical validity.
+  - Highlights cognitive biases and social expectations shaping explanation uptake.
+  - Justifies feature-based solution properties as interpretable cues.
+  - Supports our claim that intelligibility depends on design and presentation.
+
+- [cite:@liptonMythosModelInterpretability2017]
+  - Disentangles forms of interpretability: transparency vs. post hoc.
+  - Warns against vague claims; advocates precise notions of "interpretation.”
+  - Motivates focusing on human-centric, task-grounded interpretability targets.
+  - Supports our distinction between model interpretability and solution interpretability.
+  - Lends conceptual clarity to our metrics’ interpretability roles.
+
+- [cite:@tverskyJudgmentUncertaintyHeuristics1974]
+  - Foundational work on heuristics and biases in human judgment under uncertainty.
+  - Underpins expectation that heuristic cues guide preferences and trust.
+  - Justifies that simple structural patterns (e.g., sorted order) can shape judgments.
+  - Supports interpreting "easier to understand" as reliance on familiar cues.
+  - Connects interpretability to predictable cognitive shortcuts.
+
+- [cite:@dietvorstAlgorithmAversionPeople2015]
+  - Documents algorithm aversion even when algorithms outperform humans.
+  - Indicates that small errors can erode trust disproportionately.
+  - Motivates the need for intelligible, confidence-building solution presentations.
+  - Supports preference for solutions that are easy to justify.
+  - Frames interpretability as a lever to reduce aversion and misuse.
+
+- [cite:@swellerCognitiveLoadProblem1988]
+  - Cognitive load theory: schema acquisition hindered by high processing demands.
+  - Predicts that simpler compositions reduce working-memory burden.
+  - Justifies our compositional complexity (CC) construct (few items, near-full/near-empty).
+  - Supports claims about presentation order and overload.
+  - Motivates measuring RT as a proxy for processing effort.
+
+- [cite:@zerilliHowTransparencyModulates2022]
+  - Reviews trust and transparency in human–AI teaming, advocating vigilance.
+  - Argues that transparency extends beyond explanations to useful task signals.
+  - Supports balancing explanation with other design strategies (ordering, confidence).
+  - Reinforces user-facing presentation as crucial for appropriate reliance.
+  - Aligns with our "interpretability-aware" output design proposal.
+
+- [cite:@bussoneRoleExplanationsTrust2015]
+  - In clinical decision support, explanation detail affects trust and reliance.
+  - Too much detail can induce over-reliance; too little undermines trust.
+  - Supports careful selection of intelligible structural cues rather than volume.
+  - Motivates balancing simplicity and informativeness in presentation.
+  - Reinforces human factors in explanation design.
+
+- [cite:@leeTrustAutomationDesigning2004]
+  - Conceptual model for trust in automation and appropriate reliance.
+  - Emphasizes context, system characteristics, and display influences on trust.
+  - Justifies our focus on solution presentation as a trust lever.
+  - Connects interpretability to system use in uncertain, dynamic settings.
+  - Guides practical display design to support calibrated reliance.
+
+- [cite:@barredoarrietaExplainableArtificialIntelligence2020]
+  - Comprehensive taxonomy of XAI methods, audiences, and goals.
+  - Positions interpretability within responsible AI (fairness, accountability).
+  - Provides wide-angle motivation for explainability in deployment.
+  - Supports our "audience-attuned" approach to intelligible outputs.
+  - Links structural solution cues to practical XAI objectives.
+
+- [cite:@abdulTrendsTrajectoriesExplainable2018]
+  - HCI-centered map of explainability, accountability, intelligibility trends.
+  - Highlights the role of interfaces in bringing explanations to users.
+  - Supports designing outputs that match human cognitive expectations.
+  - Motivates our focus on solution-level clarity and user comprehension.
+  - Aligns with calls for built-in intelligibility in autonomous systems.
+
+- [cite:@rudinStopExplainingBlack2019]
+  - Argues for inherently interpretable models over black-box explanations in high-stakes use.
+  - Motivates secondary objectives that favor interpretable outputs without losing optimality.
+  - Supports our proposal for interpretability-aware optimization and tie-breaking.
+  - Encourages prioritizing human-readability in sensitive domains.
+  - Frames our contribution as actionable and risk-aware.
+
+- [cite:@narayananHowHumansUnderstand2018]
+  - User studies on verification cost of explanations under varying complexity.
+  - Shows that complexity increases human verification time.
+  - Supports our hypothesis linking structural simplicity to interpretability.
+  - Justifies capturing preference and RT as interpretable outcome measures.
+  - Aligns with our emphasis on minimal, human-verifiable structure.
+
+- [cite:@gigerenzerHeuristicDecisionMaking2011]
+  - Formalizes "fast-and-frugal" heuristics and when they outperform complex methods.
+  - Grounds preference for heuristic-aligned solutions (HC) as cognitively adaptive.
+  - Justifies ignoring some information to gain accuracy and speed in low predictability.
+  - Supports our claim that familiar construction rules aid understanding.
+  - Links interpretability benefits to ecological rationality.
+
+- [cite:@cormenIntroductionAlgorithms2009]
+  - Standard reference on algorithms, including greedy methods and knapsack heuristics.
+  - Supports our LBF–LIF greedy baseline used to define HC.
+  - Provides canonical background for algorithmic constructs we reference.
+  - Lends authority to vocabulary and baseline solution concepts.
+  - Bridges theory with our experimental construction.
+
+- [cite:@tverskyAnimationCanIt2002]
+  - Reviews when animations help or hinder comprehension and learning.
+  - Emphasizes the Congruence and Apprehension Principles in graphics.
+  - Supports that clear, ordered layouts aid understanding; clutter hinders.
+  - Reinforces our visual-order complexity (VC) construct.
+  - Motivates careful, simple presentation over dynamic complexity.
+
+- [cite:@feldmanSimplicityPrinciplePerception2016]
+  - Surveys the simplicity principle (Occam’s razor) in cognitive science.
+  - Explains how minimizing description length aids inference.
+  - Supports that simple structural patterns are preferred and easier to encode.
+  - Grounds CC/VC as cognitively plausible simplicity proxies.
+  - Links our perceptual claims to probabilistic accounts of inference.
+
+- [cite:@vanderhelmSimplicityLikelihoodVisual2000]
+  - Connects simplicity and likelihood principles in visual perception.
+  - Argues viewpoint-dependent aspects align the two principles in everyday perception.
+  - Supports the preference for rule-like order (e.g., sorted sequences).
+  - Reinforces our VC rationale for ordered presentations.
+  - Provides theoretical basis from perception for our design choices.
+
+- [cite:@foxExplainablePlanning2017]
+  - Explains leveraging model-based plan representations to communicate with users.
+  - Highlights gap between planning algorithms and human problem solving.
+  - Supports aligning plans with user mental models for trust and usability.
+  - Motivates interpretability-aware solution formatting and tie-breaking.
+  - Links our approach to explainable planning practices.
+
+- [cite:@chakrabortiPlanExplanationsModel2017]
+  - Introduces model reconciliation explanations for planning under model mismatch.
+  - Emphasizes aligning human and agent models for plan acceptance.
+  - Supports viewing interpretability as cognitive alignment, not just correctness.
+  - Motivates heuristic-aligned and ordered presentations for shared understanding.
+  - Connects planning explanations to our human-centered optimization outputs.
+
+- [cite:@coffmanApproximationAlgorithmsBin1997]
+  - Survey of approximation algorithms for bin packing, including greedy schemes.
+  - Provides canonical context for simple yet strong heuristics (e.g., FFD).
+  - Supports the plausibility of our greedy baseline as cognitively natural.
+  - Reinforces that simple heuristics capture much of packing structure.
+  - Links heuristics to recognizable assignment patterns.
+
+- [cite:@kellererKnapsackProblems2004]
+  - Standard monograph on knapsack problems: theory, algorithms, and heuristics.
+  - Supplies foundational background for our problem class and baselines.
+  - Justifies using greedy constructions as references for human reasoning.
+  - Provides breadth on structural and algorithmic variants we reference.
+  - Anchors our study in the knapsack literature canon.
+
+- [cite:@macgregorHumanPerformanceTraveling2011]
+  - Review of human performance on TSP and related optimization problems.
+  - Documents reliance on simple geometric/heuristic cues to find good solutions.
+  - Supports that humans prefer near-linear-time, visually organized solutions.
+  - Motivates expectation that structured solutions feel more interpretable.
+  - Connects human strategy literature to our preference findings.
+
+- [cite:@dumnicPathGameCrowdsourcingTimeconstrained2019]
+  - Crowdsourced TSP solutions under time constraints, revealing human strategies.
+  - Shows instinctive heuristics emerge when speed is emphasized.
+  - Supports linking task structure to observable human solution patterns.
+  - Motivates studying interpretability under moderate task constraints.
+  - Reinforces the importance of intuitive structure in rapid decisions.
+
+- [cite:@murawskiHowHumansSolve2016]
+  - Human performance on knapsack; complexity reduces quality and increases time.
+  - Shows heterogeneity and algorithm-like commonalities in attempts.
+  - Supports that structural properties predict effort and outcomes.
+  - Motivates our complexity metrics (CC/VC/HC) as behaviorally relevant.
+  - Connects NP-hardness to human strategy and interpretability.
+
+- [cite:@francoGenericPropertiesComputational2021]
+  - Proposes instance-level complexity measures (TCC/IC) predicting human effort/quality.
+  - Validates that structural hardness explains time and accuracy in knapsack tasks.
+  - Supports that instance properties, not just algorithms, drive behavior.
+  - Motivates feature-based predictors for human performance.
+  - Aligns with our structural metrics as interpretable proxies.
+
+- [cite:@francoTaskindependentMetricsComputational2022]
+  - Extends task-independent hardness metrics across multiple cognitive tasks.
+  - Predicts time and accuracy from generic structural measures.
+  - Reinforces generality of structure–behavior links beyond specific domains.
+  - Supports our claim that solution structure shapes human processing.
+  - Motivates focusing on interpretable structural cues for usability.
+
+- [cite:@kyritsisPerceivedOptimalityCompeting2022]
+  - Humans struggle discriminating optimal from near-optimal ETSP tours.
+  - Shows geometric properties can predict perceived optimality vs. true optimality.
+  - Supports our paired evaluation approach and potential preference–optimality gap.
+  - Motivates using solution-level metrics to explain judgments.
+  - Aligns with our view that structure (not just value) drives preferences.
+
+- [cite:@ehrgottMulticriteriaOptimization2005]
+  - Foundations of multi-criteria optimization (Pareto, scalarization, heuristics).
+  - Supports adding interpretability as a secondary objective/tie-breaker.
+  - Provides methods to balance optimality with human-centered criteria.
+  - Motivates multi-objective formulations in practical deployments.
+  - Grounds our "interpretability-aware optimization" proposal.
+
+- [cite:@luceResponseTimesTheir1986]
+  - Theoretical treatment of RT as window into mental organization.
+  - Supports log-RT modeling and interpreting speed differences.
+  - Motivates linking larger separations to faster decisions.
+  - Grounds RT as a process measure complementary to choice.
+  - Justifies analyzing RT alongside preference to index effort.
+
+- [cite:@papoutsakiWebgazerScalableWebcam2016]
+  - Introduces WebGazer for scalable webcam eye tracking in the browser.
+  - Establishes feasibility of online gaze measurement without lab equipment.
+  - Supports our web-based dwell-time data collection approach.
+  - Aligns with aggregate measures given lower spatial precision.
+  - Provides technical precedent for our eye-tracking methodology.
+
+- [cite:@ecksteinEyeGazeWhat2017]
+  - Reviews ocular measures (pupil, blink) and gaze as cognition indicators.
+  - Supports using dwell as a coarse marker of attention allocation.
+  - Motives expectations around load and processing reflected in eye metrics.
+  - Encourages complementing choices with process-level ocular signals.
+  - Guides interpretation limits given our aggregate online setup.
+
+- [cite:@gollanGazeQuantifyingConscious2025]
+  - Proposes a gaze-based biomarker (CPI) for conscious perception in VR.
+  - Shows gaze-derived signals can classify engagement/awareness.
+  - Supports the broader premise that eye-based markers index cognitive state.
+  - Motivates using gaze alongside behavior to triangulate interpretability.
+  - Provides contemporary evidence for eye tracking’s diagnostic value.
+
+- [cite:@afsarDesigningEmpiricalExperiments2023]
+  - Discusses experimental design for comparing interactive optimization methods.
+  - Provides questionnaires/templates for human-in-the-loop studies.
+  - Supports future work on standardized interpretability measurement.
+  - Encourages replicable, reusable user-study setups.
+  - Aligns with our call for robust evaluation designs beyond preference alone.
+
 
 * Load Metrics :noexport:
 #+MACRO: n   src_elisp{(my/fmt-int (apply 'my/json-get "$1" (split-string "$2" "\\.")))}
