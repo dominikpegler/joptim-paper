@@ -273,7 +273,8 @@ For statistical analyses, its signed right-left difference is denoted $\Delta\te
 :PROPERTIES:
 :CLASS: runin apa
 :END:
-This metric assesses the complexity based on the composition of items in each bin. To do so, each bin is interpreted as the outcome of a generative model, and the degree of surprisal associated with that outcome is measured. In this context, greater surprisal reflects higher complexity, as it indicates deviations from the expected patterns dictated by the model. Conversely, a low level of surprisal signifies simplicity, suggesting that the bin conforms closely to these preferred patterns. A bin is characterized by three quantities: (a) the number of items, \(N\); (b) the vector of relative item sizes, \(C\), which sums to one when the bin is nonempty; and (c) the unused capacity fraction, E. Assuming conditional independence, the joint density factorizes as
+
+This metric assesses complexity based on the composition of items in each bin. Each bin is treated as the outcome of a generative model, and we quantify how surprising that outcome is under the model. In this context, greater surprisal reflects higher complexity, as it indicates deviations from the expected patterns dictated by the model. Conversely, a low level of surprisal signifies simplicity, suggesting that the bin conforms closely to these preferred patterns. A bin is characterized by three quantities: (a) the number of items, $N$; (b) the vector of relative item sizes, $C$, which sums to one when the bin is nonempty; and (c) the unused capacity fraction, E. Assuming conditional independence, the joint density factorizes as
 
 #+begin_export latex
 \begin{equation}\label{eqn-joint-probability}
@@ -297,7 +298,7 @@ For $N > 0$, the vector C is drawn from a symmetric Dirichlet distribution with 
 :PROPERTIES:
 :CLASS: runin apa
 :END:
-The unused fraction E is described by a two-component mixture placing equal probability mass near 0 and 1. Consequently, bins that are almost full or almost empty are regarded as simple, whereas bins that are half-filled are deemed more surprising and therefore complex. Each component can take the form of a truncated normal, a truncated Laplace, or a continuous Bernoulli distribution; a common scale parameter \(\sigma\) controls how sharply the mass concentrates around the extremes (selection of these parameters is addressed below). For a single bin, the negative log-probability
+The unused fraction E is described by a two-component mixture placing equal probability mass near 0 and 1. Consequently, bins that are almost full or almost empty are regarded as simple, whereas bins that are half-filled are deemed more surprising and therefore complex. Each component can take the form of a truncated normal, a truncated Laplace, or a continuous Bernoulli distribution; a common scale parameter $\sigma$ controls how sharply the mass concentrates around the extremes (selection of these parameters is addressed below). For a single bin, the negative log-probability
 
 #+begin_export latex
 \begin{equation}\label{eqn-complexity-single-bin}
@@ -305,7 +306,18 @@ L\  = -\left[\ln p(N)\  + \ \ln p(C\ |\ N)\  + \ \ln p(E\ |\ N)\right]
 \end{equation}
 #+end_export
 
-quantifies its surprise and therefore complexity --- in nats. The CC of an entire solution is the mean of \(L\) over all bins. Solutions consisting of few-item bins that are either nearly empty or nearly full, and whose item sizes conform to the symmetry favored by the Dirichlet prior, yield low surprise values, while deviations from these simple patterns result in higher values.
+quantifies its surprise and therefore complexity --- in nats. The CC of an entire solution is the mean of $L$ over all bins. Solutions consisting of few-item bins that are either nearly empty or nearly full, and whose item sizes conform to the symmetry favored by the Dirichlet prior, yield low surprise values, while deviations from these simple patterns result in higher values. As summarized in Figure ref:fig:cc-graphical-model, this bin-level generative model can be viewed as a simple Bayesian network in which the number of items $N$ shapes both the composition of loads $C$ and the unused capacity $E$. The resulting compositional complexity of a solution is then defined as the average surprise of its bins under this model.
+
+
+#+begin_export latex
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.25\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/fig_cc_graphical_model.pdf}
+  \caption{\label{fig:cc-graphical-model}Graphical Model for Compositional Complexity}
+  \par\footnotesize\textit{Note}. Bayesian-network representation of the single-bin compositional complexity (CC) model. The number of items $N$ is drawn from a geometric prior. Conditional on $N$, the relative item sizes $C$ follow a symmetric Dirichlet distribution, and the unused capacity fraction $E$ follows a bimodal distribution over near-empty and near-full bins. The per-bin surprise $L$ in Equation~\ref{eqn-complexity-single-bin} is the negative log-probability of observing $(N, C, E)$.
+\end{figure}
+#+end_export
+
 ***** Fitted Parameters
 As noted above, the model includes several tunable parameters that influence the complexity evaluation. The empty space fraction can be described using different distributions, such as truncated normal, truncated Laplace, or continuous Bernoulli. The scale parameter controls the concentration of probability mass in these distributions. Additionally, parameter $p$ determines how strongly the geometric law penalizes bins with many items, and parameter $\alpha$ sets the preference for symmetry in the composition of loads using the Dirichlet distribution. Prior to each experiment (exploratory or confirmatory), a dedicated fitting procedure was conducted to determine these parameters (see Appendix ref:sec:calibration for details). 
 
