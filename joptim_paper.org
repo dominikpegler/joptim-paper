@@ -47,8 +47,6 @@ Best practice:
 Report what data cleaning has been completed, outlier/data  removal, transformations (e.g., centering or standardizing  variables) or other changes prior to or following analysis  (e.g., Baayen & Milin, 2015).  Report whether models meet assumptions for LMMs.  Report if transformations were carried out in order to meet  assumptions (e.g., log transformation of reaction time to  meet the assumption that residuals are normally distributed)
 #+end_example
 
-** TODO justify the choice of AIC
-
 ** TODO report complete model comparisons in appendix
 
 - also with info about convergence issues
@@ -59,10 +57,7 @@ Report what data cleaning has been completed, outlier/data  removal, transformat
 - might be good to also show the z-scores of the other metrics. Although we cant make causal claims, for interpretation we could see how well the other metrics could also explain the choice probabilities. E.g., one example shows -1.8 for CC, but it might also have -2.7 for heuristic. Then it would be good example for the combination of both and not for only CC.
 
 ** TODO final check: check if methods align with code
-
-** helmholtz, hospitals
-
-** what are the weights in the efficiency equation and does RT unit influence the weights?
+** TODO re-run preprocessing (with new efficiency computation) and complete downstream analyis
 
 * Introduction
 
@@ -414,11 +409,20 @@ E_{i,j} = \frac{S_{i,j}}{O_{i}} \div RT_{i,j},
 \end{equation}
 #+end_export
 
-\noindent where \(S_{i,j}\) is the score obtained by participant \(j\), \(O_{i}\) is the optimal score for the problem instance in trial \(i\), and \(RT_{i,j}\) is the reaction time (RT) (ms). Trial-specific difficulty weights ($w_{i}$) were derived from group efficiency. Let $\bar{E}_{i}$ denote the mean $E$ across participants on trial $i$. We first normalized these trial-wise efficiencies within each trial file to obtain relative “easiness” weights that summed to one. We then converted these to “hardness” weights by inverting and renormalizing them so that harder trials (with lower mean efficiency) received proportionally larger weights. A participant's overall PSE ($\eta_{j}$) was the weighted sum
+
+\noindent where \(S_{i,j}\) is the score obtained by participant \(j\), \(O_{i}\) is the optimal score for the problem instance in trial \(i\), and \(RT_{i,j}\) is the reaction time (seconds). Trial-specific difficulty weights ($w_{i}$) were derived from group efficiency. Let $n$ denote the number of problem-solving trials (here $n = 7$), and let $\bar{E}_{i}$ be the mean $E$ across participants on trial $i$. The difficulty weights were then defined as
+
+#+begin_export latex
+\begin{equation}\label{eqn-efficiency-2}
+w_{i} = \frac{\sum_{k=1}^{n} \bar{E}_{k} - \bar{E}_{i}}{(n - 1)\,\sum_{k=1}^{n} \bar{E}_{k}}
+\end{equation}
+#+end_export
+
+\noindent so that trials with lower mean efficiency (harder trials) received larger weights. A participant's overall PSE ($\eta_{j}$) was the weighted sum
 
 #+begin_export latex
 \begin{equation}\label{eqn-efficiency-3}
-\eta_{j}\  = \sum_{i = 1}^{7}w_{i}\ E_{i,j}.
+\eta_{j}\  = \sum_{i = 1}^{n}w_{i}\ E_{i,j}.
 \end{equation}
 #+end_export
 
