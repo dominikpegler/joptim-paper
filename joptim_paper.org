@@ -302,7 +302,7 @@ E \sim \tfrac{1}{2}\,\mathrm{Norm}_{(0,1)}(0,\sigma) + \tfrac{1}{2}\,\mathrm{Nor
 \end{equation}
 #+end_export
 
-and analogous mixtures for the truncated Laplace and continuous Bernoulli options [cite/p:@loaiza-ganemContinuousBernoulliFixing2019]. A common scale parameter $\sigma$ controls how sharply the mass concentrates around the extremes (selection of these parameters is addressed below). For a single bin, the negative log-probability
+\noindent and analogous mixtures for the truncated Laplace and continuous Bernoulli options [cite/p:@loaiza-ganemContinuousBernoulliFixing2019]. A common scale parameter $\sigma$ controls how sharply the mass concentrates around the extremes (selection of these parameters is addressed below). For a single bin, the negative log-probability
 
 #+begin_export latex
 \begin{equation}\label{eqn-complexity-single-bin}
@@ -310,7 +310,7 @@ L\  = -\left[\ln p(N)\  + \ \ln p(C\ |\ N)\  + \ \ln p(E\ |\ N)\right]
 \end{equation}
 #+end_export
 
-quantifies its surprise and therefore complexity --- in nats. Solutions consisting of few-item bins that are either nearly empty or nearly full, and whose item sizes conform to the symmetry favored by the Dirichlet prior, yield low surprise values, while deviations from these simple patterns result in higher values. The resulting compositional complexity of a solution is then defined as the average surprise of its bins under this model.
+\noindent quantifies its surprise and therefore complexity --- in nats. Solutions consisting of few-item bins that are either nearly empty or nearly full, and whose item sizes conform to the symmetry favored by the Dirichlet prior, yield low surprise values, while deviations from these simple patterns result in higher values. The resulting compositional complexity of a solution is then defined as the average surprise of its bins under this model.
 
 # TODO: instead: use a a figure to describe CC by showing the single distributions (optional: have 2 more panels that describe the other two metrics)
 
