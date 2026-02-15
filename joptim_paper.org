@@ -270,7 +270,7 @@ Since heuristic solutions to ordered problem instances (bins and items sorted in
 :CLASS: runin apa
 :END:
 
-This metric assesses complexity based on the composition of items in each bin. Each bin is treated as the outcome of a generative model, and we quantify how surprising that outcome is under the model. In this context, greater surprisal reflects higher complexity, as it indicates deviations from the expected patterns dictated by the model. Conversely, a low level of surprisal signifies simplicity, suggesting that the bin conforms closely to these preferred patterns. A bin is characterized by three quantities: (a) the number of items, $N$; (b) the vector of relative item sizes, $C$, which sums to one when the bin is nonempty; and (c) the unused capacity fraction, E. Assuming conditional independence, the joint density factorizes as
+This metric assesses complexity based on the composition of items in each bin. Each bin is treated as the outcome of a generative model, and we quantify how surprising that outcome is under the model. In this context, greater surprisal reflects higher complexity, as it indicates deviations from the expected patterns dictated by the model. Conversely, a low level of surprisal signifies simplicity, suggesting that the bin conforms closely to these preferred patterns. A bin is characterized by three quantities: (a) the number of items, $N$; (b) the vector of relative item sizes, $C$, which sums to one when the bin is nonempty; and (c) the unused capacity fraction, $E$. Assuming conditional independence, the joint density factorizes as
 
 #+begin_export latex
 \begin{equation}\label{eqn-joint-probability}
@@ -282,19 +282,27 @@ p(N,\ C,\ E)\  = \ p(N)\  \cdot \ p(C\ |\ N)\  \cdot \ p(E\ |\ N).
 :PROPERTIES:
 :CLASS: runin apa
 :END:
-\(N\) follows a geometric law starting at zero. The distribution assigns higher probability to small item counts; thus, bins that hold many items contribute more to the surprise score.
+$N$ follows a geometric law starting at zero, $N \sim \mathrm{Geom}(p)$. The distribution assigns higher probability to small item counts; thus, bins that hold many items contribute more to the surprise score.
 
 ***** Composition of Item Sizes
 :PROPERTIES:
 :CLASS: runin apa
 :END:
-For $N > 0$, the vector C follows a symmetric Dirichlet distribution with concentration $\alpha$. When $\alpha > 1$, the model prefers evenly split items sizes; when $\alpha < 1$, it favors one dominating item and several very small ones. An optional correction removes the baseline probability of the perfectly even split, ensuring that surprise, and thus complexity, reflects deviations from the preferred pattern rather than the size of the simplex. For empty bins ($N = 0$), this term is absent.
+For $N > 0$, the vector C follows a symmetric Dirichlet distribution with concentration $\alpha$, $C \sim \mathrm{Dir}(\alpha)$. When $\alpha > 1$, the model prefers evenly split items sizes; when $\alpha < 1$, it favors one dominating item and several very small ones. An optional correction removes the baseline probability of the perfectly even split, ensuring that surprise, and thus complexity, reflects deviations from the preferred pattern rather than the size of the simplex. For empty bins ($N = 0$), this term is absent.
 
 ***** Empty Space
 :PROPERTIES:
 :CLASS: runin apa
 :END:
-The unused fraction E follows a two-component mixture distribution placing equal probability mass near 0 and 1. Consequently, bins that are almost full or almost empty are regarded as simple, whereas bins that are half-filled are deemed more surprising and therefore complex. The components can either take the form of a truncated normal, a truncated Laplace, or a continuous Bernoulli distribution [cite/p:@loaiza-ganemContinuousBernoulliFixing2019]; a common scale parameter $\sigma$ controls how sharply the mass concentrates around the extremes (selection of these parameters is addressed below). For a single bin, the negative log-probability
+The unused fraction $E$ follows a two-component mixture distribution placing equal probability mass near 0 and 1. Consequently, bins that are almost full or almost empty are regarded as simple, whereas bins that are half-filled are deemed more surprising and therefore complex. The components can be one of three different forms. For example, in one variant we use a truncated normal mixture,
+
+#+begin_export latex
+\begin{equation}\label{eqn-empty-space-norm}
+E \sim \tfrac{1}{2}\,\mathrm{Norm}_{(0,1)}(0,\sigma) + \tfrac{1}{2}\,\mathrm{Norm}_{(0,1)}(1,\sigma),
+\end{equation}
+#+end_export
+
+and analogous mixtures for the truncated Laplace and continuous Bernoulli options [cite/p:@loaiza-ganemContinuousBernoulliFixing2019]. A common scale parameter $\sigma$ controls how sharply the mass concentrates around the extremes (selection of these parameters is addressed below). For a single bin, the negative log-probability
 
 #+begin_export latex
 \begin{equation}\label{eqn-complexity-single-bin}
