@@ -93,7 +93,7 @@ As shown in Figure ref:fig:complexity, we operationalize these properties with t
 \begin{figure}[htbp]
   \centering \includegraphics[width=1.0\textwidth]{~/Dropbox/data_export/joptim-analysis/pub/fig_metrics.pdf}
   \caption{\label{fig:complexity}Three Metrics for Describing Complexity of Solutions}
-\par\footnotesize\textit{Note}. The three panels describe our intuition behind the three hypothesized complexity metrics. Each focuses on a different aspect of the solution, as highlighted by the red annotations. Panel {\bfseries{a}}: Heuristic-related complexity (HC) focuses on the assignments and how much they deviate from the greedy heuristic. Panel {\bfseries{b}}: Compositional complexity (CC) focuses on the bins and how clean/organized/filled (see definition) they are. Panel {\bfseries{c}}: Visual-order complexity (VC) focuses on whether the elements of the solution are sorted by size or follow a chaotic order.\end{figure}
+\par\footnotesize\textit{Note}. The three panels describe our intuition behind the three hypothesized complexity metrics. Each focuses on a different aspect of the solution, as highlighted by the red annotations. HC focuses on the assignments and how much they deviate from the greedy heuristic. CC focuses on the bins and how clean/organized/filled (see definition) they are. VC focuses on whether the elements of the solution are sorted by size or follow a chaotic order.\end{figure}
 #+end_export
 
 ** Prior Work and Gap
@@ -526,7 +526,7 @@ These confirmatory findings generally align with the exploratory analysis. Howev
 \begin{figure}[htbp]
   \centering \includegraphics[height=0.75\textheight]{~/Dropbox/data_export/joptim-analysis/pub/confirmatory/mlm_choice/fig_example_solutions_per_metric.pdf}
   \caption{\label{fig:choice-examples-confirmatory}Example Pairs with Model-Predicted Choice Probabilities}
-  \par\footnotesize\textit{Note}. Example stimulus pairs used in the experiment across the three complexity metrics (HC = heuristic-related complexity, CC = compositional complexity, VC = visual-order complexity) and the covariate diagonal dissimilarity (DD). Each panel shows the left–right solutions and their complexity difference (R–L; negative = left more complex) signified by the triangle marker. The horizontal bar displays model-predicted choice probabilities (\%) for definitely/slightly choosing left or right (corresponding to Figure \ref{fig:choice-probabilities-confirmatory}).\end{figure}
+  \par\footnotesize\textit{Note}. Example stimulus pairs used in the experiment across the three complexity metrics (HC, CC, VC) and the covariate diagonal dissimilarity (DD). Each panel shows the left–right solutions and their complexity difference (R–L; negative = left more complex) signified by the triangle marker. The horizontal bar displays model-predicted choice probabilities (\%) for definitely/slightly choosing left or right (corresponding to Figure \ref{fig:choice-probabilities-confirmatory}).\end{figure}
 #+end_export
 
 ** Reaction Time: Faster Responses with Larger Heuristic Differences
