@@ -393,7 +393,7 @@ This solution-pair-level metric is derived from the VC of two solutions. Rather 
 :PROPERTIES:
 :CLASS: runin apa
 :END:
-This problem-level metric was operationalized as the ratio of the sum of item sizes to the sum of all bin capacities. This continuous metric ranges from 0.8 to 1.0 in the sampled problems, with higher values denoting greater difficulty of a particular problem instance (see also [[#a.1.-generation-of-problem-and-solution-instances][Generation of Problem and Solution Instances]] in Appendix ref:sec:stimulus-generation). This ratio captures the inherent challenge within our packing task by reflecting the relative tightness of the space to be filled. A higher ratio implies that the items collectively approach the available capacity more closely, thereby increasing the demand for optimal packing strategies, a nuance that aligns well with theoretical perspectives on resource constraints and cognitive load [cite/p:@swellerCognitiveLoadProblem1988]. 
+This problem-level metric was operationalized as the ratio of the sum of item sizes to the sum of all bin capacities. This continuous metric ranges from 0.8 to 1.0 in the sampled problems, with higher values denoting greater difficulty of a particular problem instance (see also [[#a.1.-generation-of-problem-and-solution-instances][Generation\nbsp{}of\nbsp{}Problem\nbsp{}and\nbsp{}Solution\nbsp{}Instances]] in Appendix ref:sec:stimulus-generation). This ratio captures the inherent challenge within our packing task by reflecting the relative tightness of the space to be filled. A higher ratio implies that the items collectively approach the available capacity more closely, thereby increasing the demand for optimal packing strategies, a nuance that aligns well with theoretical perspectives on resource constraints and cognitive load [cite/p:@swellerCognitiveLoadProblem1988]. 
 
 **** Heuristic Optimality (HO, Problem-Level)
 :PROPERTIES:
@@ -681,7 +681,7 @@ This research was funded by the Austrian Research Promotion Agency (FFG), Projec
 
 #+latex: \clearpage
 
-* Appendices                                                           :ignore:
+* Appendices :ignore:
 #+LATEX: \appendix
 
 ** Supplementary Methods
@@ -1036,7 +1036,7 @@ Based on the AIC-based model selection procedure, the intercept-only model was s
 
 
 
-** Summary of Participant Problem-Solving and Evaluation Strategies
+** Summary of Participant Problem-Solving and Evaluation Strategies :noexport:
 :PROPERTIES:
 :CUSTOM_ID: appendix-f-summary-of-participant-problem-solving-and-evaluation-strategies
 :END:
