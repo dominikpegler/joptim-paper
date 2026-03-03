@@ -509,7 +509,7 @@ We tested z-scored right–left differences in heuristic-related complexity (HC)
 
 Across all evaluation trials, choice proportions were: definitely left {{{pct(desc_c,trials.choice_props.def_left,%.1f%%)}}}, slightly left {{{pct(desc_c,trials.choice_props.sl_left,%.1f%%)}}}, slightly right {{{pct(desc_c,trials.choice_props.sl_right,%.1f%%)}}}, and definitely right {{{pct(desc_c,trials.choice_props.def_right,%.1f%%)}}}. Pairwise correlations among the focal predictors were modest ($\max |r| =$ {{{f(desc_c,correlations.diff.max_abs_r,%.2f)}}}), indicating limited collinearity (Appendix ref:sec:supplementary-results).
 
-These confirmatory findings generally align with the exploratory analysis. However, one notable deviation was that the main effect of DD was not statistically significant in the confirmatory sample. Conversely, CC demonstrated a comparatively stronger influence in the confirmatory sample, particularly after its parameters were calibrated based on the exploratory data. Cross-study summary plots are shown in Appendix ref:sec:cross-study-summary. 
+These confirmatory findings generally align with the exploratory analysis. However, one notable deviation was that the main effect of DD was not statistically significant in the confirmatory sample. Conversely, CC, whose parameters we had optimized based on the exploratory data, demonstrated a comparatively stronger influence in the confirmatory sample. Cross-study summary plots are shown in Appendix ref:sec:cross-study-summary. 
 
 
 #+INCLUDE: "~/Dropbox/data_export/joptim-analysis/pub/confirmatory/mlm_choice/tab_choice.tex" src latex
@@ -613,7 +613,7 @@ Notably, the robust effect of HC suggests that participants may be applying fami
 
 Larger heuristic differences ($|\Delta\text{HC}|$) were associated with faster evaluations, consistent with our second hypotheses and the idea that familiar construction reduces decisional conflict [cite/p:@gigerenzerHeuristicDecisionMaking2011; @swellerCognitiveLoadProblem1988]. In contrast, differences in bin compositions and order ($|\Delta\text{CC}|$) and ($|\Delta\text{VC}|$) did not reliably shorten decisions, suggesting these features guide preference without necessarily compressing total deliberation in our low-pressure setting. While the exploratory sample showed broader RT reductions, the HC-specific pattern here likely depends on stimulus distributions and cohort differences, leaving HC as the only universal speed effect [cite/p:@luceResponseTimesTheir1986].
 
-We hypothesized that complexity differences would manifest in attentional asymmetry; however, aggregate side-wise dwell did not vary with complexity under webcam-based tracking, and the results suggested a modest left-gaze tendency. In paired presentations of equally optimal alternatives, brief or small asymmetries may be swamped by inter-trial variability. 
+We hypothesized that complexity differences would manifest in attentional asymmetry; however, aggregate side-wise dwell did not reliably vary with complexity under webcam-based tracking, and the results suggested a modest left-gaze tendency. In paired presentations of equally optimal alternatives, brief or small asymmetries may be swamped by inter-trial variability. 
 ** Limitations
 :PROPERTIES:
 :CUSTOM_ID: limitations
