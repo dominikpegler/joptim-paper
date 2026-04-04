@@ -5,7 +5,7 @@
 #+project: JOptim paper
 #+created: [2023-10-30 Mon]
 #+last_modified: [2023-10-30 Mon 22:24]
-#+PUBLISH_DIR:2026_joptim_chb
+#+PUBLISH_DIR:2026_joptim_submission_chb
 #+LaTeX_HEADER:\authorsnames{}
 #+LaTeX_HEADER:\authorsaffiliations{}
 #+LaTeX_HEADER:\shorttitle{INTERPRETABILITY CRITERIA FOR COMBINATORIAL SOLUTIONS}
