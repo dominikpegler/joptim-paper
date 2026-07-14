@@ -1,0 +1,46 @@
+#+STARTUP: entitiespretty overview indent align
+#+OPTIONS: toc:nil h:6 num:t title:nil author:nil email:nil date:nil ':t ^:{} tags:nil todo:nil broken-links:mark
+#+LATEX_CLASS: elsarticle
+#+LATEX_CLASS_OPTIONS: [preprint,12pt,authoryear,doubleblind]
+#+CITE_EXPORT: natbib
+#+BIND: org-cite-export-processors '((latex natbib) (t basic))
+#+BIND: org-latex-pdf-process '("pdflatex -interaction nonstopmode -output-directory %o %f" "BIBINPUTS=/home/user/Dropbox/org/ref: bibtex %b" "pdflatex -interaction nonstopmode -output-directory %o %f" "pdflatex -interaction nonstopmode -output-directory %o %f")
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+LATEX_HEADER: \usepackage[T1]{fontenc}
+#+LATEX_HEADER: \usepackage{graphicx}
+#+LATEX_HEADER: \usepackage{longtable}
+#+LATEX_HEADER: \usepackage[figuresright]{rotating}
+#+LATEX_HEADER: \usepackage{amsmath}
+#+LATEX_HEADER: \usepackage{textcomp}
+#+LATEX_HEADER: \usepackage{amssymb}
+#+LATEX_HEADER: \usepackage{hyperref}
+#+LATEX_HEADER: \usepackage{booktabs}
+#+LATEX_HEADER: \usepackage{threeparttable}
+#+LATEX_HEADER: \usepackage{tabularx}
+#+LATEX_HEADER: \usepackage{threeparttablex}
+#+LATEX_HEADER: \usepackage{siunitx}
+#+LATEX_HEADER: \usepackage{makecell}
+#+LATEX_HEADER: \usepackage{multirow}
+#+LATEX_HEADER: \usepackage{placeins}
+#+LATEX_HEADER: \usepackage{float}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usepackage{upquote}
+#+LATEX_HEADER: \usepackage{pdflscape}
+#+LATEX_HEADER: \usepackage[left]{lineno}
+#+LATEX_HEADER: \AtBeginDocument{\linenumbers}
+#+LATEX_HEADER: \biboptions{authoryear}
+#+LATEX_HEADER: \journal{Computers in Human Behavior}
+#+LATEX_HEADER: \lstset{
+#+LATEX_HEADER:   basicstyle=\ttfamily\scriptsize,
+#+LATEX_HEADER:   identifierstyle=\ttfamily,
+#+LATEX_HEADER:   breaklines=true, prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+#+LATEX_HEADER:   keywords={},
+#+LATEX_HEADER:   upquote=true,
+#+LATEX_HEADER:   columns=fixed,
+#+LATEX_HEADER:   rulecolor=,
+#+LATEX_HEADER:   aboveskip=1.0\baselineskip,
+#+LATEX_HEADER:   numbers=left,
+#+LATEX_HEADER:   numberstyle=\scriptsize,
+#+LATEX_HEADER:   frame=single,
+#+LATEX_HEADER:   extendedchars=true,
+#+LATEX_HEADER: }
