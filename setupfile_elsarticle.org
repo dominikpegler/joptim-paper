@@ -1,7 +1,7 @@
 #+STARTUP: entitiespretty overview indent align
 #+OPTIONS: toc:nil h:4 num:t title:nil author:nil email:nil date:nil ':t ^:{} tags:nil todo:nil broken-links:mark
 #+LATEX_CLASS: elsarticle
-#+LATEX_CLASS_OPTIONS: [final,12pt,authoryear,doubleblind,onecolumn]
+#+LATEX_CLASS_OPTIONS: [preprint,12pt,authoryear,doubleblind,onecolumn]
 # for submission [preprint,12pt,authoryear,doubleblind,onecolumn]
 # for final [final,3p,times,authoryear,twocolumn]
 #+CITE_EXPORT: natbib
