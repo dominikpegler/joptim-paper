@@ -1,7 +1,9 @@
 #+STARTUP: entitiespretty overview indent align
-#+OPTIONS: toc:nil h:6 num:t title:nil author:nil email:nil date:nil ':t ^:{} tags:nil todo:nil broken-links:mark
+#+OPTIONS: toc:nil h:4 num:t title:nil author:nil email:nil date:nil ':t ^:{} tags:nil todo:nil broken-links:mark
 #+LATEX_CLASS: elsarticle
-#+LATEX_CLASS_OPTIONS: [preprint,12pt,authoryear,doubleblind]
+#+LATEX_CLASS_OPTIONS: [final,12pt,authoryear,doubleblind,onecolumn]
+# for submission [preprint,12pt,authoryear,doubleblind,onecolumn]
+# for final [final,3p,times,authoryear,twocolumn]
 #+CITE_EXPORT: natbib
 #+BIND: org-cite-export-processors '((latex natbib) (t basic))
 #+BIND: org-latex-pdf-process '("pdflatex -interaction nonstopmode -output-directory %o %f" "BIBINPUTS=/home/user/Dropbox/org/ref: bibtex %b" "pdflatex -interaction nonstopmode -output-directory %o %f" "pdflatex -interaction nonstopmode -output-directory %o %f")
@@ -23,13 +25,11 @@
 #+LATEX_HEADER: \usepackage{multirow}
 #+LATEX_HEADER: \usepackage{placeins}
 #+LATEX_HEADER: \usepackage{float}
-#+LATEX_HEADER: \usepackage{listings}
 #+LATEX_HEADER: \usepackage{upquote}
 #+LATEX_HEADER: \usepackage{pdflscape}
-#+LATEX_HEADER: \usepackage[left]{lineno}
-#+LATEX_HEADER: \AtBeginDocument{\linenumbers}
-#+LATEX_HEADER: \biboptions{authoryear}
-#+LATEX_HEADER: \journal{Computers in Human Behavior}
+
+# for code listing
+#+LATEX_HEADER: \usepackage{listings}
 #+LATEX_HEADER: \lstset{
 #+LATEX_HEADER:   basicstyle=\ttfamily\scriptsize,
 #+LATEX_HEADER:   identifierstyle=\ttfamily,

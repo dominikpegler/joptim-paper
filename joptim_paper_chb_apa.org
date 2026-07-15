@@ -1810,5 +1810,5 @@ Errors if file or key is missing."
 * LocVar :noexport:
 # Local Variables:
 # mode: org
-# eval: (add-hook 'org-export-before-processing-hook (lambda (_backend) (let ((pos (org-babel-find-named-block "json-setup"))) (when pos (goto-char pos) (org-babel-execute-src-block))) (when (fboundp 'my/json-clear-cache) (my/json-clear-cache))) nil t)
+# eval: (add-hook 'org-export-before-processing-hook (lambda (backend) (let ((pos (org-babel-find-named-block "json-setup"))) (when pos (goto-char pos) (org-babel-execute-src-block))) (when (fboundp 'my/json-clear-cache) (my/json-clear-cache)) (when (fboundp 'my/run-default-org-export-before-processing-hooks) (my/run-default-org-export-before-processing-hooks backend))) nil t)
 # End:
