@@ -4,7 +4,7 @@
 #+project: JOptim paper
 #+created: [2023-10-30 Mon]
 #+last_modified: [2023-10-30 Mon 22:24]
-#+PUBLISH_DIR:2026_joptim_submission_chbr
+#+PUBLISH_DIR:2026_joptim_submission_chbr/supplementary_material
 #+setupfile: setupfile_elsarticle.org
 #+BIBLIOGRAPHY: ~/Dropbox/org/ref/ref_bibtex.bib
 #+BIND: org-babel-inline-result-wrap "%s"
